@@ -5,25 +5,38 @@
 
        Build settings shared by every plugin. Each plugin's project file imports this
        one. The plugins are compiled against the game's own assemblies and the mod
-       loader's, which are found in the game folder named by GameDir below; none of
-       them is copied into the build output. -->
+       loader's, which are found in your own copy of the game; none of them is copied
+       into the build output, and none is part of this repository.
+
+       Where the game is: set the environment variable HAVENCRAFT_GAME_DIR to the folder
+       that holds HavenCraft.exe, with BepInEx 5 installed in it. Or pass
+       -p:GameDir="..." on the command line. Or create a file GameDir.local.props next
+       to this one (it is ignored by git) containing:
+         <Project><PropertyGroup><GameDir>C:\path\to\HavenCraft</GameDir></PropertyGroup></Project> -->
+
+  <Import Project="$(MSBuildThisFileDirectory)GameDir.local.props" Condition="Exists('$(MSBuildThisFileDirectory)GameDir.local.props')" />
 
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
     <LangVersion>latest</LangVersion>
     <Nullable>disable</Nullable>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <DebugType>none</DebugType>
-    <!-- The game folder to build against: a copy with the BepInEx mod loader installed. -->
 
-    <GameDir>$(MSBuildThisFileDirectory)..\HavenCraft_Alpha-6.0.5\HavenCraft_Alpha-6.0.5</GameDir>
+    <!-- Each plugin's file ends up in its own build folder, whichever way it is built. -->
+    <OutputPath>build\</OutputPath>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+
+    <GameDir Condition="'$(GameDir)' == ''">$(HAVENCRAFT_GAME_DIR)</GameDir>
+
+    <!-- The game's assemblies and Unity's overlap in a few type names and versions;
+         these warnings are about that, not about the plugins' code. -->
     <NoWarn>$(NoWarn);CS0436;MSB3277;CS1701;CS1702</NoWarn>
   </PropertyGroup>
+
   <ItemGroup>
     <!-- The shared code is compiled into each plugin, so every plugin is a single file
          that works on its own. -->
-
     <Compile Include="$(MSBuildThisFileDirectory)Shared\*.cs" LinkBase="Shared" />
     <Reference Include="$(GameDir)\BepInEx\core\BepInEx.dll" Private="false" />
     <Reference Include="$(GameDir)\BepInEx\core\0Harmony.dll" Private="false" />
@@ -34,4 +47,15 @@
     <Reference Include="$(GameDir)\HavenCraft_Data\Managed\Assembly-CSharp.dll" Private="false" />
     <Reference Include="$(GameDir)\HavenCraft_Data\Managed\Newtonsoft.Json.dll" Private="false" />
   </ItemGroup>
+
+  <!-- Without the game there is nothing to compile against. Say so plainly, before the
+       compiler produces a thousand errors about missing types. -->
+  <Target Name="CheckGameDir" BeforeTargets="ResolveAssemblyReferences;CoreCompile">
+    <Error Condition="'$(GameDir)' == ''"
+           Text="The game folder is not set. Set the environment variable HAVENCRAFT_GAME_DIR to the folder that holds HavenCraft.exe (with BepInEx 5 installed), or pass -p:GameDir=..., or create GameDir.local.props. See the comment at the top of Common.props." />
+    <Error Condition="'$(GameDir)' != '' and !Exists('$(GameDir)\HavenCraft_Data\Managed\Assembly-CSharp.dll')"
+           Text="No HavenCraft game found in '$(GameDir)'. GameDir must be the folder that holds HavenCraft.exe." />
+    <Error Condition="'$(GameDir)' != '' and Exists('$(GameDir)\HavenCraft_Data\Managed\Assembly-CSharp.dll') and !Exists('$(GameDir)\BepInEx\core\BepInEx.dll')"
+           Text="BepInEx 5 is not installed in '$(GameDir)'. Install it first: https://github.com/BepInEx/BepInEx/releases" />
+  </Target>
 </Project>

@@ -1,0 +1,40 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Geoland.Planting", "Geoland.Planting\Geoland.Planting.csproj", "{F92AACED-4213-4F6B-9EF4-A10A1D5523AF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Geoland.Harvest", "Geoland.Harvest\Geoland.Harvest.csproj", "{96D52223-0AE8-49B4-82CC-D820F3F5163F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Geoland.PlotLevels", "Geoland.PlotLevels\Geoland.PlotLevels.csproj", "{98F14DEF-1E71-470F-BB85-8E7FFB0FE9B4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Geoland.RecruitWishes", "Geoland.RecruitWishes\Geoland.RecruitWishes.csproj", "{F15521D0-E2F4-4198-B6FD-50623B7C13A9}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F92AACED-4213-4F6B-9EF4-A10A1D5523AF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F92AACED-4213-4F6B-9EF4-A10A1D5523AF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F92AACED-4213-4F6B-9EF4-A10A1D5523AF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F92AACED-4213-4F6B-9EF4-A10A1D5523AF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{96D52223-0AE8-49B4-82CC-D820F3F5163F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{96D52223-0AE8-49B4-82CC-D820F3F5163F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{96D52223-0AE8-49B4-82CC-D820F3F5163F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{96D52223-0AE8-49B4-82CC-D820F3F5163F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{98F14DEF-1E71-470F-BB85-8E7FFB0FE9B4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{98F14DEF-1E71-470F-BB85-8E7FFB0FE9B4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{98F14DEF-1E71-470F-BB85-8E7FFB0FE9B4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{98F14DEF-1E71-470F-BB85-8E7FFB0FE9B4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F15521D0-E2F4-4198-B6FD-50623B7C13A9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F15521D0-E2F4-4198-B6FD-50623B7C13A9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F15521D0-E2F4-4198-B6FD-50623B7C13A9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F15521D0-E2F4-4198-B6FD-50623B7C13A9}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

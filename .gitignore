@@ -20,3 +20,9 @@ install-plugins.cmd
 .env
 *.zip
 HavenCraft_*/
+
+# This machine's game folder for building (see Common.props)
+GameDir.local.props
+
+# The release zip made by package.ps1.
+dist/
