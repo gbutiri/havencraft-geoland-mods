@@ -1,0 +1,7 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\Common.props" />
+  <PropertyGroup>
+    <AssemblyName>Geoland.PlotLevels</AssemblyName>
+    <RootNamespace>Geoland.PlotLevels</RootNamespace>
+  </PropertyGroup>
+</Project>

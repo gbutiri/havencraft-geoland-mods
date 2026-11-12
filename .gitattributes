@@ -1,0 +1,4 @@
+* text=auto
+*.cs text diff=csharp
+*.cmd text eol=crlf
+*.dll binary

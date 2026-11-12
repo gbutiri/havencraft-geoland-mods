@@ -1,0 +1,22 @@
+# Build output
+build/
+bin/
+obj/
+
+# Editor and operating system files
+.vs/
+.vscode/
+*.user
+Thumbs.db
+.DS_Store
+
+# Kept on the author's machine only: working notes, earlier versions of the source,
+# and the script that copies the plugins into the author's own test copy of the game.
+INTERNAL.md
+retired/
+install-plugins.cmd
+
+# Never part of this repository: secrets, the game, or anything taken from it.
+.env
+*.zip
+HavenCraft_*/

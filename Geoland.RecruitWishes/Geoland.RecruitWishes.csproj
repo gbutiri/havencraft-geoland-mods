@@ -1,0 +1,7 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\Common.props" />
+  <PropertyGroup>
+    <AssemblyName>Geoland.RecruitWishes</AssemblyName>
+    <RootNamespace>Geoland.RecruitWishes</RootNamespace>
+  </PropertyGroup>
+</Project>
