@@ -2,14 +2,15 @@
 # Part of the Geoland library: unofficial, fan-made mods for HavenCraft.
 # HavenCraft is the work of Dionic Software; this project is not affiliated with them.
 #
-# package.ps1: makes the release zip, dist\Geoland-library-<yyyy-MM-dd>.zip, from what
+# package.ps1: makes the release zip, dist\Geoland-library-<version>.zip, from what
 # is already built. It does not compile anything: build the mods first.
 #
 # Inside the zip:
 #   BepInEx\plugins\Geoland.*.dll    the four mods, laid out as in the game folder
-#   README.md, LICENSE
+#   README.md, LICENSE, VERSION
 #   install.cmd, install.ps1         the installer
 #   CHANGELOG-<mod>.md               each mod's history
+#   docs\How-It-Works.md             how the game is put together and how the mods hook in
 #
 # Works on Windows PowerShell 5.1 and later.
 
@@ -37,12 +38,13 @@ function Add-Entry([string]$RelativeSource, [string]$PathInZip) {
 foreach ($name in $ModNames) {
     Add-Entry ($name + '\build\' + $name + '.dll') ('BepInEx/plugins/' + $name + '.dll')
 }
-foreach ($file in @('README.md', 'LICENSE', 'install.cmd', 'install.ps1')) {
+foreach ($file in @('README.md', 'LICENSE', 'VERSION', 'install.cmd', 'install.ps1')) {
     Add-Entry $file $file
 }
 foreach ($name in $ModNames) {
     Add-Entry ($name + '\CHANGELOG.md') ('CHANGELOG-' + $name + '.md')
 }
+Add-Entry 'docs\How-It-Works.md' 'docs/How-It-Works.md'
 
 if ($missing.Count -gt 0) {
     Write-Host ''
@@ -57,7 +59,19 @@ $distDir = Join-Path $Root 'dist'
 if (-not (Test-Path -LiteralPath $distDir -PathType Container)) {
     New-Item -ItemType Directory -Path $distDir | Out-Null
 }
-$zipPath = Join-Path $distDir ('Geoland-library-' + (Get-Date -Format 'yyyy-MM-dd') + '.zip')
+# The library has a version of its own, kept in the VERSION file. Each mod inside keeps
+# its own version too; the library's number names the set that was released together.
+$versionFile = Join-Path $Root 'VERSION'
+if (-not (Test-Path -LiteralPath $versionFile -PathType Leaf)) {
+    Write-Host 'No VERSION file found next to package.ps1.'
+    exit 1
+}
+$version = (Get-Content -LiteralPath $versionFile -TotalCount 1).Trim()
+if ($version -notmatch '^\d+\.\d+\.\d+$') {
+    Write-Host "The VERSION file must hold a version like 0.1.0, not '$version'."
+    exit 1
+}
+$zipPath = Join-Path $distDir ('Geoland-library-' + $version + '.zip')
 if (Test-Path -LiteralPath $zipPath) { Remove-Item -LiteralPath $zipPath -Force }
 
 Add-Type -AssemblyName System.IO.Compression

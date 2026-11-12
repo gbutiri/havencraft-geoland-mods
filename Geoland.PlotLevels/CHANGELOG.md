@@ -5,7 +5,7 @@
 ## 0.5.1
 
 - The keys J, L and H are gone. Levels are painted and erased with the plot painter's own click and erase button, which already did the same. K, to pick a plot, stays, and now only acts while the plot painter is selected.
-- Levels on the ground floor, which versions before 0.3.1 could make by mistake, are removed when a world loads. The ground floor follows the game's normal plots again. The plugin says so once when it removes any.
+- Levels on the ground floor, which versions before 0.3.1 could make by mistake, are removed when a world loads. The ground floor follows the game's normal plots again. The plugin says so once when it removes any. Raising the `MinHeightAboveGround` setting does not remove levels painted under a lower value.
 - The source was reorganised: one class per file, each opening with what it is for and how it relates to the game.
 - The plugin now checks at start-up that the parts of the game it reaches into are still there, and the log says what is missing. If the plot painter has changed, levels already in a save are still honoured but cannot be painted. If the save system has changed, the plugin switches itself off.
 - The painter's values are no longer looked up by name every frame, and the brush preview is rebuilt only when the brush moves.

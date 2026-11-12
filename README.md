@@ -1,8 +1,8 @@
 # The Geoland library: fan-made mods for HavenCraft
 
-Four small mods for HavenCraft, the village-building game by Dionic Software. They are unofficial and made by a fan. HavenCraft is the work of Dionic Software, and this project is not affiliated with them. The developer has kindly said these may be published.
+Four small mods for HavenCraft, the village-building game by Dionic Software. They are unofficial and made by a fan. HavenCraft is the work of Dionic Software, and this project is not affiliated with them. Published with the developer's permission. Not made, endorsed or supported by Dionic Software.
 
-Written for HavenCraft **Alpha 6.0.5**, on Windows.
+Written for HavenCraft **Alpha 6.0.5**, on Windows. The library as a whole has a version of its own (see `VERSION` and the Releases page); each mod inside also keeps its own.
 
 | Mod | What it does |
 |---|---|
@@ -15,10 +15,12 @@ Each mod is a single file and works on its own. Install only the ones you want.
 
 ## Before you install
 
-- **Your saves get marked as modded, permanently.** The mods run on [BepInEx](https://github.com/BepInEx/BepInEx), a third-party mod loader. The game notices the mod loader. From then on every save it writes is marked as modded, and that mark cannot be removed, even after the mods and the mod loader are gone. The game's error reports also say that unofficial mods were detected.
-- **Do not send the developer bug reports from a modded game.** If something goes wrong with a mod installed, report it [here](https://github.com/gbutiri/havencraft-geoland-mods/issues) instead. The mods add their own names and versions to the game's error report and to the save's description, on purpose, so that anyone looking can see what was installed.
-- **The game is in alpha.** A game update can break a mod. When that happens the mod says so in the BepInEx log and switches the affected part off, so the game behaves as it does without it.
-- **Back up your saves first.** They are in `%USERPROFILE%\AppData\LocalLow\Dionic Software\HavenCraft\saves`, one folder per world. Copy that folder somewhere safe. If you want to keep a world unmarked, play modded in a copy of it.
+- **Your saves get marked as modded, permanently.** The mods run on [BepInEx](https://github.com/BepInEx/BepInEx), a third-party mod loader. The game detects the mod loader. From then on every save it writes is marked as modded, and that mark cannot be removed, even after the mods and the mod loader are gone. The game's error reports also say that unofficial mods were detected.
+- **The mark is caused by the mod loader, not by these mods.** Every world you save while BepInEx is installed gets marked, including worlds in which you never use the mods. Removing only the Geoland DLLs does not stop that. To play unmarked again you must remove BepInEx itself (the files listed under Uninstall). Saves already marked stay marked.
+- **Do not send the developer bug reports from a modded game.** If something goes wrong with a mod installed, report it [here](https://github.com/gbutiri/havencraft-geoland-mods/issues) instead. The mods add their own names and versions to the game's list of mods, on purpose, so that anyone looking can see what was installed. This has been seen in a save's description. The error report itself has not been looked at.
+- **The game is in alpha.** A game update can break a mod. For the parts of the game they look up by name, the mods are designed to say so in the BepInEx log and switch the affected part off, so that the game behaves as it does without it. This has not been seen with a real game update. If anything behaves oddly after an update, the safe course is to remove the mod.
+- **Back up your saves first.** They are in `%USERPROFILE%\AppData\LocalLow\Dionic Software\HavenCraft\saves`, one folder per world. Copy that folder somewhere safe.
+- **To keep a world unmarked, play modded in a copy of it.** With the game closed, copy the world's folder inside the saves folder to a new folder name next to it. Play modded only in the copy, and do not save the original world while BepInEx is installed. The author did this for his own world. A caution: Steam Cloud may sync the saves folder.
 
 ## Install
 
@@ -28,17 +30,19 @@ Each mod is a single file and works on its own. Install only the ones you want.
 4. Start the game once, wait for the main menu, and quit. BepInEx has now created its folders, `BepInEx\plugins` among them.
 5. Download the Geoland library zip from the [Releases page](https://github.com/gbutiri/havencraft-geoland-mods/releases) and unzip it anywhere.
 6. Put the mods in, one of two ways:
-   - **With the installer:** double-click `install.cmd` in the unzipped folder. It finds the game through Steam, checks that the game is closed and that BepInEx is there, and copies the four mods into `BepInEx\plugins`. It changes nothing else.
-   - **By hand:** copy the `Geoland.*.dll` files you want from the zip's `BepInEx\plugins` folder into the game's `BepInEx\plugins` folder.
-7. Start the game. `BepInEx\LogOutput.log` in the game folder has a line for each mod that loaded, such as `Geoland.Planting 0.8.1 loaded`.
+   - **By hand:** copy the `Geoland.*.dll` files you want from the zip's `BepInEx\plugins` folder into the game's `BepInEx\plugins` folder. That is all an install is.
+   - **With the installer, if you prefer (optional, Windows only):** double-click `install.cmd` in the unzipped folder. It finds the game through Steam, checks that the game is closed and that BepInEx is there, and copies the four mods into `BepInEx\plugins`. It changes nothing else. It is a plain PowerShell script, `install.ps1`, that you can read before running.
+7. Start the game. `BepInEx\LogOutput.log` in the game folder has a line for each mod that loaded, a line containing for example `Geoland.Planting 0.8.1 loaded, 4 patches applied, 0 failed`.
 
-More about the installer, run from a command prompt in the unzipped folder:
+You never need the installer; it only saves the copying. More about it, run from a command prompt in the unzipped folder:
 
 ```
 install.cmd -GameDir "C:\path\to\the game folder"    if the game is not found, or found twice
 install.cmd -DryRun                                   show what would be copied, copy nothing
 install.cmd -Uninstall                                remove the four Geoland mods again
 ```
+
+Do not end the folder path with a backslash.
 
 The installer does not install BepInEx, and it never deletes or overwrites anything except the four Geoland DLLs.
 
@@ -61,7 +65,7 @@ Plant things yourself. The item selected in your hotbar decides what gets plante
 - Press **G** to switch planting mode on and off. The key is ignored while you are typing in a text field or have a menu open.
 - With the mode on and one of those items selected, a ghost of the plant shows the spot you are aiming at. Its outline shows whether the spot is good or refused.
 - Click to plant. One of the item is used up. With the mode off, or any other item selected, clicks do what they always do.
-- Limits: within 12 cells of your character, not too close to water, and not right next to another object.
+- Limits: within 12 cells of your character, not too close to water, and not on or beside the spot where another object stands (a large object is checked by its position, not its whole footprint).
 
 Settings, in `geoland.havencraft.planting.cfg`: `ToggleKey` (default `G`).
 
@@ -83,7 +87,7 @@ Villagers harvest. Paint a Farm plot over berry bushes, beehives, plain bushes o
 - Which items have already been taken from an object is not saved. After loading, a full object offers all its items again. Harvesting by hand always gives everything.
 - Wild bee nests and the giant berry bush are left to the player. Villagers do not harvest them.
 
-Settings, in `geoland.havencraft.harvest.cfg`: one on/off switch for each kind of harvestable object. All are on by default.
+Settings, in `geoland.havencraft.harvest.cfg`: one on/off switch for each kind of harvestable object. All are on by default. The file may not exist until a world has been loaded once. Its switches are named after the game's internal names for the kinds of object.
 
 If you remove the mod: a world saved with these work orders still loads, but that farm's work orders are reset to the game's defaults. This comes from reading how the game loads saves; it has not been tried.
 
@@ -111,17 +115,17 @@ Good to know:
 - A level runs from its floor upward until the next painted level above it. A third floor belongs to whatever the second floor was given, until you paint or erase the third floor itself.
 - Aim at bare floor. The height is taken from the surface under the crosshair, so aiming at a table top gives the table's height.
 - Known rough edge: the painter's own feedback text still describes the ground plot while you aim upstairs.
-- Single-player only.
-- Levels are stored inside the save file. If you remove the mod, the game ignores them and upstairs objects fall back to the plot on the ground.
+- Not tested in multiplayer and not expected to work there: the levels are not sent to other players. Nothing stops you trying.
+- Levels are stored inside the save file. If you remove the mod, the game ignores them. This comes from reading the game's code; it has not been tried. Two things follow. Without the mod, upstairs objects such as beds count for the plot on the ground again. And the first save made without the mod no longer contains the levels, so they are gone for good.
 
-Settings, in `geoland.havencraft.plotlevels.cfg`: `PickPlot` (the pick key, default `K`) and `MinHeightAboveGround` (default `2`): an upper level must start at least this many blocks above the terrain, and anything lower counts as the ground floor.
+Settings, in `geoland.havencraft.plotlevels.cfg`: `PickPlot` (the pick key, default `K`) and `MinHeightAboveGround` (default `2`): an upper level must start at least this many blocks above the terrain, and anything lower counts as the ground floor. Lowering or raising it only affects what can be painted from then on; levels already painted are kept.
 
 ### Geoland.RecruitWishes
 
 A traveler joins the village when you bring what they ask for. The game has a fixed list of joining prices and uses each once, in order. When the list is used up, every traveler asks for the last one. This mod changes only that repeat:
 
 - Before the game's own list is used up, nothing changes.
-- After that, each traveler has a wish of their own: one kind of good a village makes, in an amount a person could carry. Food and farm goods, workshop products, furniture and decoration. Nothing raw such as stone or wood.
+- After that, each traveler has a wish of their own: one kind of good a village makes, in an amount a person could carry. Food and farm goods, workshop products, furniture and decoration. No stone or wood.
 - A traveler's wish is worked out from that traveler's ID number, so it does not change while you gather it. Nothing is stored in the save.
 
 Settings, in `geoland.havencraft.recruitwishes.cfg`: `Enabled` (default `true`) and `Pool`, the list of goods and amounts, written as `item:min-max` separated by commas. Item names are the game's internal names. Names the game does not know are skipped and listed in the log.
@@ -139,21 +143,35 @@ All four mods, current versions, load cleanly on Alpha 6.0.5.
 | **Geoland.PlotLevels** 0.5.1 | Beds above a shop counting for the home; painting on the second and third floors (previous version). Tiles showing while the painter is out (current version) | A villager sleeping in an upstairs bed |
 | **Geoland.RecruitWishes** 0.2.1 | Three travelers recruited through varied wishes (previous version) | A wish staying the same after saving and loading |
 
-Nothing here has been tested in multiplayer. Geoland.PlotLevels is single-player only.
+Also not yet seen: the mods' names appearing in the game's error report.
+
+Nothing here has been tested in multiplayer. Geoland.PlotLevels is not tested in multiplayer and not expected to work there: the levels are not sent to other players. Nothing stops you trying.
 
 ## Uninstall
 
 1. Close the game.
 2. Delete the four `Geoland.*.dll` files from the game's `BepInEx\plugins` folder, or run `install.cmd -Uninstall`.
-3. To remove the mod loader too, delete these from the game folder: the `BepInEx` folder, `winhttp.dll`, `doorstop_config.ini`, `.doorstop_version` and `changelog.txt`.
+
+That removes the mods. It does not stop the game marking saves: the mod loader causes the mark, and it is still installed.
+
+**Removing BepInEx is a separate step, and it is required if you want new saves to be unmarked:**
+
+1. Close the game.
+2. Delete these from the game folder: the `BepInEx` folder, `winhttp.dll`, `doorstop_config.ini`, `.doorstop_version` and `changelog.txt`.
 
 Saves written while the mod loader was installed stay marked as modded.
 
+What removing a mod means for a world that used it:
+
+- **Geoland.Harvest:** the farm's work orders are reset to the game's defaults. This comes from reading the game's code; it has not been tried.
+- **Geoland.PlotLevels:** the game ignores the levels. This too comes from reading the game's code and has not been tried. Upstairs objects such as beds count for the plot on the ground again. The first save made without the mod no longer contains the levels, so they are gone for good.
+- **Geoland.Planting** and **Geoland.RecruitWishes** store nothing of their own in a save.
+
 ## Troubleshooting
 
-- **The log** is `BepInEx\LogOutput.log` in the game folder. It is rewritten each time the game starts. Look there first.
+- **The log:** the mods write to `BepInEx\LogOutput.log` in the game folder; the same lines also appear in the game's own `Player.log`. `LogOutput.log` is rewritten each time the game starts. Look there first.
 - **No Geoland lines in the log, or no log at all:** BepInEx is not running. Check that `winhttp.dll` is next to `HavenCraft.exe`, that you took the x64 build of BepInEx 5, and that the DLLs are in `BepInEx\plugins`.
-- **A line starting `The game has changed:`** means a game update removed or renamed something a mod relied on. The line names what is missing and which part of the mod has been switched off. The rest of the game is unaffected. Look for a newer version of the mod.
+- **A line containing `The game has changed:`** means a game update removed or renamed something a mod relied on. The line names what is missing and which part of the mod has been switched off. If anything behaves oddly, remove the mod. Look for a newer version of the mod.
 - **A warning that a mod `was built for HavenCraft ... and this is ...`** means your game is a different version from the one the mod was written for. It may still work. If it does not, look for a newer version of the mod.
 - **A setting seems to be ignored:** edit settings files with the game closed, and check the file name matches the mod (`geoland.havencraft.<mod>.cfg`).
 - **Anything else:** open an issue [here](https://github.com/gbutiri/havencraft-geoland-mods/issues) and attach `LogOutput.log`. Please do not take it to the developer.
@@ -170,7 +188,7 @@ Each mod's file is written to its own `build` folder. If the game folder is not 
 
 `install.ps1` then installs what was built, and `package.ps1` makes the release zip in `dist\`.
 
-Every source file opens with what it is for and how it relates to the game. In each mod's folder, start with `Plugin.cs`. `GameAccess.cs` holds every place where the mod reaches into the game by name, and `CHANGELOG.md` has its history. `Shared/` is compiled into each mod. Nothing from the game is included in this repository: no code, no data, no assets.
+Every source file opens with what it is for and how it relates to the game. In each mod's folder, start with `Plugin.cs`. `GameAccess.cs` holds every place where the mod reaches into the game by name, and `CHANGELOG.md` has its history. `Shared/` is compiled into each mod. In the release zip the changelogs are named `CHANGELOG-<mod>.md`, and the source, `Geoland.sln` and `Common.props` are in the repository, not in the zip. Nothing from the game is included in this repository: no code, no data, no assets.
 
 [docs/How-It-Works.md](docs/How-It-Works.md) describes what was learned about how the game is put together, as far as a mod needs it, and how each of these mods hooks in. It may help anyone writing their own.
 

@@ -8,8 +8,10 @@
 // separate library, so each plugin is a single file that works on its own.
 //
 // How it relates to the game: HavenCraft keeps a world's systems in modules held by a
-// WorldOrchestrator. Its official mod interface does not hand those modules out yet, so
-// this class finds the orchestrator itself. It also applies a plugin's patches one class
+// WorldOrchestrator. The game's official mod interface is planned for later and does not
+// yet cover what these mods need, so this class finds the orchestrator itself, and the
+// plugins add themselves to the game's own list of mods so that they run on the game's
+// schedule (see RegisterModPatch). It also applies a plugin's patches one class
 // at a time, so that a patch which no longer fits the game is reported and skipped
 // without taking the plugin's other patches down with it.
 using System;

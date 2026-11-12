@@ -73,7 +73,7 @@ internal sealed class PlotLevelsMod : IMod
             Current = this;
 
             int withoutPlot = LevelMap.DropLevelsOfMissingPlots(plots);
-            int onGroundFloor = LevelMap.DropGroundFloorLevels(plots, LowestUpperHeight);
+            int onGroundFloor = LevelMap.DropGroundFloorLevels(plots, LowestHeightOfAKeptLevel);
             GameHook.Log.LogInfo("World loaded: " + LevelMap.CellCount + " cells have upper levels"
                 + (withoutPlot > 0 ? "; removed " + withoutPlot + " levels whose plot no longer exists" : "")
                 + (onGroundFloor > 0 ? "; removed " + onGroundFloor + " levels on the ground floor, left by an early version" : "")
@@ -192,10 +192,16 @@ internal sealed class PlotLevelsMod : IMod
         return Mathf.FloorToInt(ground) + Plugin.MinHeightAboveGround.Value;
     }
 
-    // The same for a cell, taken at the cell's centre.
-    private int LowestUpperHeight(int cellX, int cellZ)
+    // For the clean-up at world load: the lowest height at which a level in this cell is
+    // kept. It is the lower of the setting and its default, never the setting alone.
+    // Otherwise raising the setting would make the next load delete levels that were
+    // painted, quite properly, under the old value. Only what could never have been an
+    // upper floor under either is removed.
+    private int LowestHeightOfAKeptLevel(int cellX, int cellZ)
     {
-        return LowestUpperHeight(cellX + 0.5f, cellZ + 0.5f);
+        float ground = terrain.SampleHeight(new Vector2(cellX + 0.5f, cellZ + 0.5f));
+        int blocksAboveGround = Math.Min(Plugin.MinHeightAboveGround.Value, Plugin.DefaultMinHeightAboveGround);
+        return Mathf.FloorToInt(ground) + blocksAboveGround;
     }
 
     // The plot a stroke starting here paints: the upstairs section under most of the

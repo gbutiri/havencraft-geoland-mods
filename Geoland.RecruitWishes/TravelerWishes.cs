@@ -5,8 +5,9 @@
 // TravelerWishes: the pool of goods travelers may wish for, and each traveler's wish.
 //
 // A wish is worked out from the traveler's own ID number and nothing else. The same
-// traveler therefore always has the same wish: while the player gathers it, after leaving
-// and coming back, and after saving and loading. Nothing is written to the save file.
+// traveler therefore has the same wish while the player gathers it and after leaving
+// and coming back. It should also stay the same across saving and loading, which has
+// not yet been checked in the game. Nothing is written to the save file.
 //
 // How it relates to the game: the game tells joining prices apart by which list object
 // they are, not by what is in them. Each traveler's wish is therefore made once and the

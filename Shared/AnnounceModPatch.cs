@@ -4,17 +4,16 @@
 //
 // AnnounceModPatch: tells the game, by name and version, that this plugin is running.
 //
-// How it relates to the game: the game keeps a list of the mods in use. It puts that
-// list in its error reports, next to whether an unofficial mod loader was detected,
-// and writes it into the description of every save. In this version of the game the
-// list is always empty, because the game has no way yet of loading a mod itself. An
-// error report from a modded game therefore says that unofficial mods were detected
-// but not which.
+// How it relates to the game: the game detects third-party mod loaders. When it does,
+// it marks every save written afterwards as modded and says so in its error reports.
+// It also keeps a list of the mods in use, which goes into its error reports and into
+// the description of every save.
 //
-// This patch runs after the function that returns the list and adds this plugin to
-// it, so the developer can see exactly what was installed. It was asked for by the
-// developer: mods must be known to the game's mod detection. Nothing here hides
-// anything from that detection or changes what it finds.
+// This patch runs after the function that returns the list and adds this plugin's
+// name and version to it. That is the author's own choice, made so that anyone
+// reading an error report or a save's description can see which mods were in use.
+// Nothing here prevents, hides or undoes the game's detection or its marks, and
+// nothing built on this may.
 using System.Collections.Generic;
 using HarmonyLib;
 

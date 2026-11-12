@@ -42,6 +42,9 @@ public sealed class Plugin : BaseUnityPlugin
     public const string Name = "Geoland.PlotLevels";
     public const string Version = "0.5.1";
 
+    /// <summary>The default for <see cref="MinHeightAboveGround"/>, in blocks.</summary>
+    internal const int DefaultMinHeightAboveGround = 2;
+
     internal static ConfigEntry<Key> PickKey { get; private set; }
     internal static ConfigEntry<int> MinHeightAboveGround { get; private set; }
 
@@ -51,7 +54,7 @@ public sealed class Plugin : BaseUnityPlugin
 
         PickKey = Config.Bind("Keys", "PickPlot", Key.K,
             "With the plot painter selected: pick the plot you are aiming at. An upstairs floor you then click is given to it.");
-        MinHeightAboveGround = Config.Bind("Levels", "MinHeightAboveGround", 2,
+        MinHeightAboveGround = Config.Bind("Levels", "MinHeightAboveGround", DefaultMinHeightAboveGround,
             "An upper level must start at least this many blocks above the terrain. Lower floors count as the ground floor, which belongs to the game's own plot painter.");
 
         GameAccess.Resolve();

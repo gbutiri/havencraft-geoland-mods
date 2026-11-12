@@ -1,6 +1,6 @@
 # How it works: HavenCraft from a modder's side, and how the Geoland mods hook in
 
-> **About this document:** unofficial notes on how HavenCraft is put together as far as a modder needs to know, and on how the four Geoland mods hook into it. HavenCraft is the work of Dionic Software; nothing of the game (no code, no data, no assets) is included here, only descriptions in our own words and the names of things. It describes HavenCraft Alpha 6.0.5 and may be out of date after any game update. It was written with Claude, Anthropic's AI assistant.
+> **About this document:** unofficial notes on how HavenCraft is put together as far as a modder needs to know, and on how the four Geoland mods hook into it. HavenCraft is the work of Dionic Software; nothing of the game (no code, no data, no assets) is included here, only descriptions in our own words and the names of things. It describes HavenCraft Alpha 6.0.5 and may be out of date after any game update. Published with the developer's permission. Not made, endorsed or supported by Dionic Software. It was written with Claude, Anthropic's AI assistant.
 
 **How to read the certainty marks.** "Seen working" means the author saw it behave that way in the running game. "From the code" means it was only read in the game's code or data and has not been tested. Anything without a mark is from the code.
 
@@ -31,32 +31,31 @@
 ## 1. The game build and the mod loader
 
 - HavenCraft Alpha 6.0.5 is a Unity 6 game running on Mono. Its managed assemblies are ordinary .NET files in the game's `Managed` folder. The game's own are named `Haven.*`, `Dionic.*` and `Assembly-CSharp`. Almost all game types are in the global namespace.
-- The Geoland mods are BepInEx 5 plugins (Windows x64). Each plugin logs to the BepInEx log; the same lines also appear in the game's own `Player.log`, which is flushed more reliably. Read that one after a play session.
+- The Geoland mods are BepInEx 5 plugins (Windows x64). The mods write to `BepInEx\LogOutput.log` in the game folder; the same lines also appear in the game's own `Player.log`.
 - The plugins target `netstandard2.1` and reference the game's assemblies from a local install. Those assemblies are only referenced, never copied into the build output or the repository.
 - The source in `Shared/` is compiled into every plugin, so each plugin is a single file that works on its own. There is no separate framework plugin.
 - The game's version, as it writes it into saves and its log, comes from the public `Versions.GetVersion()`. The plugins log it at start-up and use it for their version check.
 
 ## 2. Mod detection
 
-- The game has an `UnofficialModDetector`. From the code: it looks beside the executable for the folders and proxy files of the common mod loaders (BepInEx among them), and for loaded asset bundles.
-- When it finds something, error reports say that unofficial mods were detected, and every save written afterwards is flagged `everUsedMods` in its description file, permanently. The game is not blocked.
-- Seen working: saves written by a game with BepInEx installed carry the flag; saves written by an unmodded install do not.
-- The game also has a list of the mods in use (`ModModule.GetMods()`), which goes into error reports and into each save's description. In this version the list is always empty. From the code: nothing reads the saved list back.
-- The Geoland plugins add their name and version to that list with a patch that runs after `GetMods` (`Shared/AnnounceModPatch.cs`), so an error report says what was installed. Seen working for the save's description: a save written with the four plugins loaded lists each by name and version. The error report itself has not been looked at.
-- Nothing in these plugins hides anything from the detector or changes what it finds. The developer asked that mods stay visible to it; please keep it that way in anything built on this.
+- The game detects third-party mod loaders. When it does, it marks every save written afterwards as modded, permanently, and says so in its error reports. The game is not blocked.
+- Seen working: saves written by a game with BepInEx installed carry the mark; saves written by an unmodded install do not.
+- The game also has a list of the mods in use (`ModModule.GetMods()`), which goes into error reports and into each save's description.
+- The Geoland plugins add their own name and version to that list with a patch that runs after `GetMods` (`Shared/AnnounceModPatch.cs`), so that it is visible what was installed. This is the author's own choice, made so that anyone reading an error report or a save's description can see which mods were in use. Seen working for the save's description: a save written with the four plugins loaded lists each by name and version. The error report itself has not been looked at.
+- These plugins do nothing to prevent, hide or undo the detection or the mark, and must not. Please keep it that way in anything built on this.
 
 ## 3. The official mod interface, and how a plugin registers with it
 
-- The game ships a small mod interface: `IMod`, with one call when a world has loaded (`OnGameLoaded`) and one every frame (`UpdateFrame`). Both receive a `Game` object.
-- Of that `Game` object, showing a notification and adding or reading input actions work. From the code: the world-object calls are stubs that do nothing or throw "not implemented".
-- A `DionicModLoaderModule` is created with every world. It holds a public list of mods and calls each one on world load and every frame. In this version nothing in the game ever puts a mod in the list.
-- **How we register** (`Shared/RegisterModPatch.cs`): a patch that runs just before the module's "world loaded" call (`WorldInitAfterSaveLoad`) adds the plugin's `IMod` to that list. The plugin then runs on the game's own schedule and is told about every world, including a reload. Seen working. Several plugins can each add their own.
+- The game has an official mod interface that is planned for later and does not yet cover what these mods need. Its `IMod` has one call when a world has loaded (`OnGameLoaded`) and one every frame (`UpdateFrame`). Both receive a `Game` object.
+- Of that `Game` object, these mods use the call that shows a notification.
+- The game creates a mod loader module (`DionicModLoaderModule`) with every world. It calls each mod in its list when the world has loaded and every frame.
+- **How we register** (`Shared/RegisterModPatch.cs`): the plugins add themselves to that list so that they run on the game's own schedule. A patch that runs just before the module's "world loaded" call (`WorldInitAfterSaveLoad`) adds the plugin's `IMod`. The plugin is then told about every world, including a reload. Seen working. Several plugins can each add their own.
 - The main menu also loads a world, with no player in it. Check that there is a main player before showing notifications.
 
 ## 4. Reaching the game's modules and private members
 
 - A world is a `WorldOrchestrator` holding modules that implement `IWorldModule`. Its `GetModule<T>()` is public.
-- The official mod interface does not hand the orchestrator out, so `Shared/GameHook.cs` finds it through the `GameOrchestrator` (two private members, read by name) and wraps the lookup as `GameHook.Module<T>()`.
+- The official mod interface does not yet hand the orchestrator out, so `Shared/GameHook.cs` finds it through the `GameOrchestrator` (two private members, read by name) and wraps the lookup as `GameHook.Module<T>()`.
 - Modules are constructed in a fixed order. Items and recipes come early, the world object module after them, the villager work and harvest modules later, and the mod loader module last. This matters when you patch constructors or data loading.
 - `InputModule` is not a world module. The plugins take it from a module that holds it privately (`PlayerActionModule`).
 - **Private members are looked up once, at start-up.** Each plugin has a `GameAccess.cs` that finds every private field, method, constructor and non-public class it needs through `Shared/GameMembers.cs`. When one is missing, the log says which, and the feature that needed it stays off instead of failing in the middle of play.
@@ -108,12 +107,12 @@
   - A worker must have **carrying room for every item** the job yields, and the recipe must list every yielded item, or the job is not planned.
   - A worker holding a **full stack of any output item** goes to clear inventory first; with no chest space she waits and retries.
   - So: one recipe per item.
-- A work order has five production modes: produce once, until storage is full, keep an amount in storage, on, and off.
+- A work order has a mode, such as keep an amount in storage.
 
 ## 9. Harvestable objects
 
 - An object is harvestable when its definition has a `resourceHarvest` component, which lists the items it yields and how long it takes to refill.
-- Alpha 6.0.5 has seven harvestable kinds: the berry bushes, the beehive and the wild bee nest, two plain bushes, and wild cotton. Each has its own yield and refill time; a beehive, for example, yields both honey and wax.
+- Several kinds of object are harvestable. Each has its own yield and refill time; a beehive, for example, yields more than one item.
 - To the game a harvestable object is either full or empty. Its component (`ResourceHarvestWOComponent`) can say whether it is full, and its harvest call takes everything and drops the items on the ground. What it yields, its refill time and the call that empties it without dropping anything are private.
 - Every change between full and empty goes through one method of that component, which makes it a good place to notice both.
 - From the code: refill does not depend on the season.
@@ -137,8 +136,8 @@
 
 ## 12. Travelers and joining prices
 
-- `TravelerModule` holds a fixed list of 29 joining prices, built in code and used once each, in order. It starts small (a few stones, then an axe) and ends with a set of standing banners.
-- `GetNPCsToConvince` is the one function the game asks for what each waiting traveler wants. It pairs travelers with the prices not yet used. When none is left, every traveler gets the last price. Which prices are used is saved with the world.
+- `TravelerModule` holds a fixed list of joining prices, used in order, each once.
+- `GetNPCsToConvince` is the one function the game asks for what each waiting traveler wants. It pairs travelers with the prices not yet used. When the list is used up, every traveler asks for the last one. Which prices are used is saved with the world.
 - The join panel shows the price, checks the player has the goods, takes them, and calls `ConvinceNPC`, which makes the traveler a villager and records the price as used by finding the same list object in the module's list. From the code: the multiplayer path uses the same two functions.
 - **Prices are compared by reference**, not by content. Always hand the panel the same list object for the same traveler.
 - `ItemModule.TryGetItem` returns nothing for an unknown item name, which is how a plugin can check names from its settings.
@@ -150,7 +149,6 @@
 - A registered part whose file is missing logs an error. To stay quiet on saves made without your plugin, tell the game the part has no file to load and read the zip yourself when the load starts.
 - **Order matters.** Add your part ahead of a part it must precede. Geoland.PlotLevels adds its part in a patch that runs before the `PlotModule` constructor, so levels are in force before the plots are loaded and objects are filed under them. Seen working: levels saved, reloaded, and in force at load.
 - The zip's file name is the save's name and its folder is the world's name; nothing inside repeats either.
-- The save's description file carries the two flags `everUsedCheats` and `everUsedMods`.
 
 ## 14. Aiming and layers
 
@@ -212,7 +210,7 @@ All four start the same way. BepInEx creates the plugin's `Plugin` class, which 
 - **What it does:** once the game's fixed list of joining prices is used up, each traveler asks for a wish of their own instead of the repeated last price.
 - **Where it hooks in:** `WishedPricePatch` runs after `GetNPCsToConvince` and swaps the last price for the traveler's wish, only where that last price has already been paid once. `WishPaidPatch` runs before `ConvinceNPC` and swaps a paid wish back for the game's last price, so the game's record of used prices stays exactly as it would be without the plugin.
 - **Why there:** those two functions are the only way in and out of the join panel.
-- A wish is worked out from the traveler's ID and nothing else, so it is stable across saving and loading and nothing is written to the save. Each traveler's wish is made once and the same list object handed out every time, because the game compares prices by reference.
+- A wish is worked out from the traveler's ID number and nothing else, so it should stay the same across saving and loading, which has not yet been checked in the game. Nothing is written to the save. Each traveler's wish is made once and the same list object handed out every time, because the game compares prices by reference.
 - The pool of wishes is read from the settings when a world has loaded, since item names can only be checked against a loaded world.
 
 ## 17. Pitfalls
@@ -238,7 +236,7 @@ All four start the same way. BepInEx creates the plugin's `Plugin` class, which 
 5. Open every source file with what it is for and how it relates to the game.
 6. Log every player action with its position and its result. The log is how problems are diagnosed afterwards.
 7. Include no code, data or assets from the game, and leave the game's mod detection alone.
-8. Test in a separate copy of the game and a separate world. Every save written with a mod loader present is flagged as modded for good.
+8. Test in a separate copy of the game and a separate world. Every save written with a mod loader present is marked as modded for good.
 
 ## 19. Assemblies worth reading
 

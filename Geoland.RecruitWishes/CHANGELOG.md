@@ -19,5 +19,5 @@
 ## 0.1.0
 
 - First version. Once the game's fixed list of joining prices is used up, each traveler has a wish of their own: one good from a pool, in an amount drawn from a range for that good.
-- A traveler's wish is worked out from the traveler's ID number, so it stays the same across saving and loading and nothing is stored in the save.
+- A traveler's wish is worked out from the traveler's ID number, so it should stay the same across saving and loading, which has not yet been checked in the game. Nothing is stored in the save.
 - The pool, the amounts, and an on/off switch are in the settings file.
