@@ -17,7 +17,6 @@ using System.Reflection;
 using BepInEx.Logging;
 using Dionic.ModAPI_1;
 using HarmonyLib;
-using UnityEngine;
 
 namespace Geoland.Shared;
 
@@ -35,6 +34,12 @@ internal static class GameHook
     /// </summary>
     internal static Func<IMod> CreateMod;
 
+    /// <summary>
+    /// The plugin's name and version, as given to <see cref="ApplyPatches"/>. It is the
+    /// name the plugin goes by in the game's list of mods (see <see cref="AnnounceModPatch"/>).
+    /// </summary>
+    internal static string PluginLabel { get; private set; }
+
     private static FieldInfo gameOrchestratorInstance;
     private static FieldInfo gameOrchestratorWorld;
 
@@ -43,9 +48,10 @@ internal static class GameHook
     /// result in one log line. Call once, from the plugin's Awake.
     /// </summary>
     /// <param name="harmonyId">The plugin's ID, which names its patches to Harmony.</param>
-    /// <param name="label">The plugin's name and version, for the log.</param>
+    /// <param name="label">The plugin's name and version, for the log and for the game's list of mods.</param>
     internal static void ApplyPatches(string harmonyId, string label)
     {
+        PluginLabel = label;
         WarnIfGameVersionDiffers(label);
         ResolveWorldAccess();
 
@@ -95,7 +101,8 @@ internal static class GameHook
 
     private static void WarnIfGameVersionDiffers(string label)
     {
-        string running = Application.version;
+        // The game's own name for its version, the one it writes into saves and its log.
+        string running = Versions.GetVersion();
         if (running == BuiltForGameVersion)
         {
             Log.LogInfo("HavenCraft " + running + ", the version " + label + " was built for");

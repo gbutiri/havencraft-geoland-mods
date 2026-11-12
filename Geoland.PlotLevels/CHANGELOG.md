@@ -11,6 +11,7 @@
 - The painter's values are no longer looked up by name every frame, and the brush preview is rebuilt only when the brush moves.
 - The log notes the game version the plugin was built for, and warns when the running game is a different one.
 - The in-game notice shows the full version number.
+- The plugin adds its name and version to the game's own list of mods, so the game's error reports and save descriptions say which mods were in use, not only that unofficial mods were detected.
 
 ## 0.5.0
 

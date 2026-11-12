@@ -9,6 +9,7 @@
 - The plugin now checks at start-up that the parts of the game it reaches into are still there. If a game update has changed one, the log says what is missing and planting stays switched off, so the game behaves as it does without the plugin.
 - The log notes the game version the plugin was built for, and warns when the running game is a different one.
 - The in-game notice shows the full version number.
+- The plugin adds its name and version to the game's own list of mods, so the game's error reports and save descriptions say which mods were in use, not only that unofficial mods were detected.
 
 ## 0.8.0
 
