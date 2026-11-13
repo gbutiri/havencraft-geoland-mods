@@ -152,6 +152,12 @@ internal sealed class PlotLevelsMod : IMod
         return input != null && (input.WasPressedThisFrame(UseItemButton) || input.WasPressedThisFrame(EraseButton));
     }
 
+    /// <summary>True while the paint button and the erase button are held together.</summary>
+    internal bool BothStrokeButtonsHeld()
+    {
+        return input != null && input.IsPressed(UseItemButton) && input.IsPressed(EraseButton);
+    }
+
     /// <summary>The buttons were let go: the next stroke chooses its plot afresh.</summary>
     internal void StrokeEnded()
     {

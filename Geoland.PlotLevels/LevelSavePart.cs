@@ -105,7 +105,8 @@ internal sealed class LevelSavePart : ISavable
         catch (Exception e)
         {
             prepared = lastPrepared;
-            GameHook.Log.LogError("Could not prepare the plot levels for saving. This save holds the levels as they were at the last good save"
+            GameHook.Log.LogError("Could not prepare the plot levels for saving. "
+                + "This save holds the levels as they were at the last good save"
                 + (lastPrepared == null ? " (none)" : "") + ": " + e);
         }
     }

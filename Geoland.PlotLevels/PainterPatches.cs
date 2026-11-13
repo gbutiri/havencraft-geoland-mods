@@ -96,10 +96,13 @@ internal static class PainterPatches
             bool upstairs = PainterAim.IsUpstairs;
             try
             {
-                // A new stroke: a button went down this frame, or none was being
-                // followed, or the painter was put away in between.
+                // A new stroke: none was being followed, or the painter was put away in
+                // between, or a button went down this frame. A button pressed while the
+                // other is still held is not a new stroke: the game keeps the plot it
+                // chose at the first click, so the stroke keeps its kind as well.
                 bool painterWasAway = Time.frameCount > lastPainterFrame + 1;
-                if (stroke == StrokeOn.NoStroke || painterWasAway || mod.StrokeStartsThisFrame())
+                bool pressedAlone = mod.StrokeStartsThisFrame() && !mod.BothStrokeButtonsHeld();
+                if (stroke == StrokeOn.NoStroke || painterWasAway || pressedAlone)
                 {
                     stroke = upstairs ? StrokeOn.Upstairs : StrokeOn.Ground;
                 }

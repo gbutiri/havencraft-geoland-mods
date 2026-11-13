@@ -188,11 +188,18 @@ internal static class HarvestWork
 
         // The game's hand-over puts in what fits and drops the rest. So the room is
         // checked first: an item is taken whole or left on the object whole.
-        if (!HasRoomFor(worker, yield) || !handOver.TryAddWorkOutputItems(yield))
+        if (!HasRoomFor(worker, yield))
         {
             GameHook.Log.LogInfo("A villager had no room for the " + item + " on "
                 + harvest.GetWorldObject().description.worldObjectName + "; it stays there.");
             return false;
+        }
+        if (!handOver.TryAddWorkOutputItems(yield))
+        {
+            // Some of it has gone into the inventory all the same, so the item counts as
+            // taken; leaving it on the object would hand that part out twice.
+            GameHook.Log.LogWarning("A villager could not carry all the " + item + " from "
+                + harvest.GetWorldObject().description.worldObjectName + ", although there seemed to be room.");
         }
 
         SimulationModule clock = Simulation(harvest);
@@ -223,7 +230,10 @@ internal static class HarvestWork
     {
         ItemContainer inventory = worker == null ? null : worker.TryGetInventory();
         if (inventory == null) return true;
-        return amounts.All(amount => inventory.GetSpaceForItem(amount.item) >= amount.amount);
+
+        // An object may list the same item more than once; the room must hold the sum.
+        return amounts.GroupBy(amount => amount.item)
+            .All(sameItem => inventory.GetSpaceForItem(sameItem.Key) >= sameItem.Sum(amount => amount.amount));
     }
 
     // One visit, everything that fits. The work order's own item has just been handed
