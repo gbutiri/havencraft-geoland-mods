@@ -2,6 +2,11 @@
 
 > **About this file:** what changed in each version of Geoland.Mines, newest first. Part of the Geoland library, unofficial mods for HavenCraft. Written with Claude, Anthropic's AI assistant, as the rest of the library was.
 
+## 0.1.2
+
+- The default rock is the medium one (`rockC`, 45 stone). `random` stays as an option of the `Rock` setting. In 0.1.1, which was not released, random was the default.
+- A `Rock` setting the plugin does not know is replaced by the medium rock.
+
 ## 0.1.1
 
 - The rocks are random by default: each new rock in a mine is a medium rock (45 stone) or a small one (21 stone), with an even chance. Before, every rock was the smallest.

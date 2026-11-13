@@ -6,7 +6,7 @@
 # is already built. It does not compile anything: build the mods first.
 #
 # Inside the zip:
-#   BepInEx\plugins\Geoland.*.dll    the four mods, laid out as in the game folder
+#   BepInEx\plugins\Geoland.*.dll    the mods, laid out as in the game folder
 #   README.md, LICENSE, NOTICE, VERSION
 #   install.cmd, install.ps1         the installer
 #   CHANGELOG-<mod>.md               each mod's history
@@ -19,7 +19,7 @@ param()
 
 $ErrorActionPreference = 'Stop'
 
-$ModNames = @('Geoland.Planting', 'Geoland.Harvest', 'Geoland.PlotLevels', 'Geoland.RecruitWishes')
+$ModNames = @('Geoland.Planting', 'Geoland.Harvest', 'Geoland.PlotLevels', 'Geoland.RecruitWishes', 'Geoland.Mines')
 $Root = Split-Path -Parent $MyInvocation.MyCommand.Path
 
 # Each entry: the file on disk, and its path inside the zip.

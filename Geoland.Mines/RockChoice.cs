@@ -11,8 +11,8 @@
 // asks the game to place one; it brings no rock of its own.
 //
 // The setting is either one of the five names, and every rock is that one, or "random".
-// With "random" each new rock is chosen afresh: medium or small with an even chance, and
-// when small, either of the two small ones. The two-cell rocks are left out of the random
+// The default is the medium rock. With "random" each new rock is chosen afresh: medium
+// or small with an even chance, and when small, either of the two small ones. The two-cell rocks are left out of the random
 // choice because they reach past the stake's middle cell. Every name is checked against
 // the running game's own list of objects when a world has loaded.
 using System;
@@ -24,7 +24,7 @@ namespace Geoland.Mines;
 internal static class RockChoice
 {
     /// <summary>The setting unless the player changes it.</summary>
-    internal const string Default = Random;
+    internal const string Default = MediumRock;
 
     /// <summary>The setting that asks for a different rock each time.</summary>
     internal const string Random = "random";
@@ -43,8 +43,9 @@ internal static class RockChoice
 
     /// <summary>
     /// The rocks a mine may get, from the settings: one name, or the list "random" draws
-    /// from. A name the setting does not know is replaced by "random". Returns null, with
-    /// a line in the log, if this version of the game has none of the rocks.
+    /// from. A name the setting does not know is replaced by the default, the medium rock.
+    /// Returns null, with a line in the log, if this version of the game has none of the
+    /// rocks.
     /// </summary>
     internal static string[] FromSettings(WorldObjectModule worldObjects)
     {
@@ -53,13 +54,15 @@ internal static class RockChoice
         if (named == null && !string.Equals(wanted, Random, StringComparison.OrdinalIgnoreCase))
         {
             GameHook.Log.LogWarning("The Rock setting is '" + wanted + "', which is neither " + Random + " nor one of "
-                + string.Join(", ", rockNames) + ". Using " + Random + ".");
+                + string.Join(", ", rockNames) + ". Using " + Default + ".");
+            named = Default;
         }
 
         if (named != null)
         {
             if (IsMinableRock(worldObjects, named)) return new[] { named };
-            GameHook.Log.LogWarning("This version of the game has no minable rock named " + named + ". Using " + Random + ".");
+            GameHook.Log.LogWarning("This version of the game has no minable rock named " + named
+                + ". Using whichever of the one-cell rocks it has.");
         }
 
         var usable = new List<string>();
