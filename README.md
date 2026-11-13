@@ -110,29 +110,62 @@ If you remove the mod: a world saved with these work orders still loads, but tha
 
 ### Geoland.PlotLevels
 
-In the game, every floor of a building belongs to the plot painted on the ground under it. This mod lets an upstairs floor belong to a different plot. It works through the game's own plot painter. With the painter selected:
+In the game, every floor of a building belongs to the plot painted on the ground under it. This mod lets an upstairs floor belong to a different plot, so the bedrooms of a home can sit above a shop. It works through the game's own plot painter, and only while the painter is the selected item.
+
+**The idea in three lines**
+
+1. Plots live on the ground. You make them with the painter, as you always did.
+2. **K** picks a plot. Think of it as picking a colour.
+3. A click on an upstairs floor gives that floor to the picked plot. That is the brush.
+
+**Controls**, with the plot painter selected:
 
 | Input | What it does |
 |---|---|
-| **K** | Pick the plot you are aiming at |
+| **K** | Pick the plot you are aiming at, on the ground or upstairs. A notice names the plot and its number. The key is ignored while you are typing in a text field or have a menu open |
 | Click on an upstairs floor | Give that floor to the picked plot. Hold and drag to cover more. If the brush starts on a section already painted on that floor, the stroke extends that section instead |
-| The painter's erase button on an upstairs floor | Hand that floor back to the plot on the ground |
+| Aim at an upstairs floor, then hold the painter's erase button | Hand that floor back to the plot on the ground beneath it |
 
-A stroke that begins on the ground floor or the terrain paints the ground as it always did. While the painter is selected, every upstairs cell that has been given to a plot shows an outlined tile in that plot's colour, and a paler patch shows the brush.
+A stroke that begins on the ground floor or the terrain paints the ground as it always did.
 
-Bedrooms above a shop, step by step:
+While the painter is selected, every upstairs cell that has been given to a plot shows an outlined tile in that plot's colour. A paler patch shows the brush. The patch has the picked plot's colour, or plain white when no plot is picked. Select another item and the tiles are hidden. They are not gone.
 
-1. Paint the foot of the stairs on the ground as a Home plot, with the painter as usual. The home needs at least one cell on the ground to exist.
-2. Aim at those cells and press K.
-3. Go upstairs and click or drag on the bedroom floor.
-4. Beds on that floor now count toward the Home plot.
+**A home above a shop, step by step**
 
-Good to know:
+You start with a building of two floors. The ground under it is painted as the shop's plot, and the second floor is empty. So far the second floor belongs to the shop too.
 
-- A stroke stays on the kind of floor it began on. A stroke begun upstairs does nothing while the brush is off the upstairs floors, on a wall or past the floor's edge. A stroke begun on the ground does nothing on an upstairs floor. To continue on the other kind of floor, release the button and press again.
-- If a plot is deleted, or erased on the ground down to nothing, its upper levels go with it. Beds and other objects upstairs then count for the plot that is there now.
+1. Select the plot painter.
+2. Paint a Home plot on the ground, with the painter as usual. One cell is enough, for example the foot of the stairs. The home must have this base on the ground, or it cannot exist.
+3. Aim at that ground cell and press **K**. A notice names the plot you picked. Check that it is the home.
+4. Go upstairs. Aim at the bare floor, not at a wall or a piece of furniture. The brush patch now lies on the floor you are standing on.
+5. Click, or hold and drag across the room. A notice says how many cells now belong to the home, and outlined tiles appear on them.
+6. Place a bed on the painted floor. It counts for the home, not for the shop. A bed that already stood there moves over to the home when you paint under it.
+7. Assign a villager to the home as you would for any home. The bed upstairs is one of the home's beds.
+
+**Rules worth knowing**
+
+- **A plot needs a base on the ground.** An upstairs floor can only be given to a plot that has at least one cell on the ground somewhere. You cannot create a new plot upstairs.
+- **Lose the base, lose the upstairs.** If a plot is deleted, or its last ground cell is erased, its upstairs floors go with it. They go back to whatever is beneath them, and beds and other objects up there count for that plot from then on.
+- **A stroke stays on the kind of floor it began on.** A stroke begun upstairs does nothing on a wall, past the floor's edge or on the ground. A stroke begun on the ground does nothing on an upstairs floor. To switch, release the button and press again.
+- **Where the stroke begins decides everything.** If you press the button while aiming at a wall or at the ground, it is a ground stroke, even when you are standing upstairs. Look where the brush patch lies before you press.
+- **To erase upstairs, aim first.** Aim at the upstairs floor, then hold the painter's erase button. Each cell you erase goes back to the plot on the ground beneath it.
+- **Painting a cell with the plot it already has changes nothing and says nothing.** This includes a floor directly above the plot's own ground cells. It belongs to that plot already, so no tile appears there.
+- **A stroke that starts on a painted section extends that section.** It uses that section's plot, not the picked one, and that plot becomes the picked one. To paint over a section with another plot, pick the other plot and start the stroke on unpainted floor, then drag in.
+- **With no plot picked, a click on bare upstairs floor paints nothing.** A notice tells you to pick one first.
+- **Colours can mislead.** The tiles use the game's own plot colours, and two plots can have very similar ones. The notice from **K** is the reliable way to tell which plot a cell belongs to.
 - A level runs from its floor upward until the next painted level above it. A third floor belongs to whatever the second floor was given, until you paint or erase the third floor itself.
 - Aim at bare floor. The height is taken from the surface under the crosshair, so aiming at a table top gives the table's height.
+- A floor less than 2 blocks above the terrain counts as the ground floor. The painter paints the ground there, as usual. The number is a setting, see below.
+
+**If something looks wrong**
+
+- **Nothing happens when I click upstairs.** Either no plot is picked (the brush patch is white, and a notice says to pick one), or the floor already belongs to the picked plot, or the stroke began on a wall or on the ground. Aim at the plot's ground cells and press **K**, aim at bare floor, then press the button again.
+- **The upstairs tiles vanished.** If the painter is not the selected item, select it and they are back. If they are still missing, the plot lost its last ground cell or was deleted, and its upstairs floors went with it. Paint the plot on the ground again, press **K** on it, and paint the upstairs floor again.
+- **I painted the ground by accident.** The stroke began with the brush on the ground: you aimed at a wall, through a gap, or at a floor too low to count as upstairs. Repair the ground with the painter as usual. Then aim at the upstairs floor, check that the brush patch lies on it, and press again.
+- **I cannot tell two colours apart.** Aim at the cell and press **K**. The notice names the plot and gives its number. This also makes that plot the picked one, so pick the plot you want to paint with again before you go on.
+
+**Limits**
+
 - Known rough edge: the painter's own feedback text still describes the ground plot while you aim upstairs.
 - Not tested in multiplayer and not expected to work there: the levels are not sent to other players. If you try it anyway, do it on a copy of a world you do not mind losing.
 - Levels are stored inside the save file. If you remove the mod, the game ignores them. This comes from reading the game's code; it has not been tried. Two things follow. Without the mod, upstairs objects such as beds count for the plot on the ground again. And the first save made without the mod no longer contains the levels, so they are gone for good.
