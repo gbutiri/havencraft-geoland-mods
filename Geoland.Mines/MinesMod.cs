@@ -59,7 +59,8 @@ internal sealed class MinesMod : IMod
             if (players.TryGetMainPlayer() != null && keeper.AnyMinerZone())
             {
                 game.notifications.Show("Geoland Mines " + Plugin.Version
-                    + " active. A Tree Stake placed on a Miner Zone is a mine: a rock appears in it for your miners, and a new one some time after it is mined out.");
+                    + " active. A Tree Stake placed on a Miner Zone is a mine: a rock appears in it for your miners, "
+                    + "and a new one some time after it is mined out.");
             }
         }
         catch (Exception e)

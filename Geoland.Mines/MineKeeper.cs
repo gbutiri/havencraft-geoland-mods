@@ -31,8 +31,10 @@
 //  - A Miner Zone has no "Plant Trees at Stakes" order, so no villager sows a mine. The
 //    player can still sow any empty stake by hand. A stake holding a sapling or a tree
 //    is one that holds something, so the plugin waits until it is gone.
-//  - The stake's own definition blocks its middle cell for walking, so nobody stands
-//    where the rock appears.
+//  - The stake's own definition blocks its middle cell for walking. So for the default
+//    rock, one cell in size, nobody should be standing where it appears. A larger rock
+//    reaches past that cell, and this was not checked for it.
+using System;
 using System.Collections.Generic;
 using Geoland.Shared;
 using Unity.Mathematics;
@@ -55,6 +57,7 @@ internal sealed class MineKeeper
     {
         public bool HeldSomething;
         public bool HeldRock;
+        public bool Failed;
         public long RockDueTick;
     }
 
@@ -122,7 +125,17 @@ internal sealed class MineKeeper
 
                 uint stakeId = (uint)stake.GetID();
                 stakeIdsSeen.Add(stakeId);
-                LookAtMine(stake, stakeId, field, plotId, now);
+                try
+                {
+                    LookAtMine(stake, stakeId, field, plotId, now);
+                }
+                catch (Exception e)
+                {
+                    // One mine that cannot be kept must not stop the others. It is left
+                    // alone for the rest of this world's session, and the log says why.
+                    if (mineByStakeId.TryGetValue(stakeId, out Mine failed)) failed.Failed = true;
+                    GameHook.Log.LogError(Describe(stake, plotId) + " is left alone after an error: " + e);
+                }
             }
         }
         ForgetMinesNotSeen();
@@ -136,6 +149,7 @@ internal sealed class MineKeeper
             mine = new Mine();
             mineByStakeId[stakeId] = mine;
         }
+        if (mine.Failed) return;
 
         WorldObject held = field.GetPlantObject();
         if (held.IsValid())
