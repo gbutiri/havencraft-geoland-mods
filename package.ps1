@@ -7,7 +7,7 @@
 #
 # Inside the zip:
 #   BepInEx\plugins\Geoland.*.dll    the four mods, laid out as in the game folder
-#   README.md, LICENSE, VERSION
+#   README.md, LICENSE, NOTICE, VERSION
 #   install.cmd, install.ps1         the installer
 #   CHANGELOG-<mod>.md               each mod's history
 #   docs\How-It-Works.md             how the game is put together and how the mods hook in
@@ -38,7 +38,7 @@ function Add-Entry([string]$RelativeSource, [string]$PathInZip) {
 foreach ($name in $ModNames) {
     Add-Entry ($name + '\build\' + $name + '.dll') ('BepInEx/plugins/' + $name + '.dll')
 }
-foreach ($file in @('README.md', 'LICENSE', 'VERSION', 'install.cmd', 'install.ps1')) {
+foreach ($file in @('README.md', 'LICENSE', 'NOTICE', 'VERSION', 'install.cmd', 'install.ps1')) {
     Add-Entry $file $file
 }
 foreach ($name in $ModNames) {
