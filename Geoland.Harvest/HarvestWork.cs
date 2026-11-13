@@ -170,7 +170,7 @@ internal static class HarvestWork
     /// own while the rest stays.
     /// </summary>
     /// <returns>False if the item was no longer there, so nothing was handed over.</returns>
-    internal static bool Finish(ResourceHarvestWOComponent harvest, string taskName, IVillagerTaskWorkHandler villager)
+    internal static bool Finish(ResourceHarvestWOComponent harvest, string taskName, IVillagerTaskWorkHandler villager, VillagerNPCComponent worker)
     {
         string item = HarvestNames.ItemOfTask(taskName);
         if (!IsAvailable(harvest, item)) return false;
@@ -194,6 +194,7 @@ internal static class HarvestWork
             regrowTickByItem[harvest] = taken;
         }
         taken[item] = clock.GetTick() + description.regenerateTicks;
+        TakeTheRestIfItFits(harvest, description, taken, worker, clock);
 
         bool anythingLeft = description.itemsOnHarvest.Any(stack => IsAvailable(harvest, stack.item.itemName));
         if (anythingLeft)
@@ -206,6 +207,66 @@ internal static class HarvestWork
             GameAccess.EmptyAndStartRefill(harvest, clock, description.regenerateTicks);
         }
         return true;
+    }
+
+    // One visit, everything that fits. The work order's own item has just been handed
+    // over the game's way. The object's other items are now put straight into the
+    // worker's inventory, each only if all of it fits; whatever does not fit stays on
+    // the object for a later visit.
+    //
+    // Why straight into the inventory: the game's hand-over accepts only the items the
+    // work order's recipe lists, and silently discards anything else. And why not list
+    // them in the recipe: the planner then insists on carrying room for all of them
+    // before it sends anyone, which is how a full honey store once stopped the wax.
+    // Done this way, each work order is still judged by its own item alone, and the
+    // extra items ride along only when there is room. The worker stores them in the
+    // plot's chests with the rest of what they carry.
+    private static void TakeTheRestIfItFits(ResourceHarvestWOComponent harvest, ResourceHarvestWOCDescription description,
+        Dictionary<string, int> taken, VillagerNPCComponent worker, SimulationModule clock)
+    {
+        if (!Plugin.TakeEverythingThatFits.Value || worker == null) return;
+        try
+        {
+            ItemContainer inventory = worker.TryGetInventory();
+            if (inventory == null) return;
+
+            foreach (ItemStack stack in description.itemsOnHarvest)
+            {
+                string other = stack.item.itemName;
+                if (taken.ContainsKey(other) && clock.GetTick() < taken[other]) continue;   // already taken
+                if (inventory.GetSpaceForItem(stack.item) < stack.amount) continue;         // does not fit: leave it
+
+                int notAdded = inventory.AddItemPartially(stack.item, stack.amount);
+                if (notAdded > 0)
+                {
+                    // The room was gone after all. Take back what went in, so the object
+                    // still holds the whole amount.
+                    inventory.TryRemoveItemFully(stack.item, stack.amount - notAdded);
+                    continue;
+                }
+                taken[other] = clock.GetTick() + description.regenerateTicks;
+            }
+        }
+        catch (Exception e)
+        {
+            GameHook.Log.LogError("Could not take an object's other items in the same visit; they stay on it: " + e);
+        }
+    }
+
+    // ---- hand-picking a half-collected object ---------------------------------------
+
+    /// <summary>
+    /// The items a villager has already taken from this object and that have not grown
+    /// back, or null if nothing has been taken. Used when the player harvests by hand,
+    /// so that the player gets only what is really left (HandHarvestPatch).
+    /// </summary>
+    internal static ICollection<string> ItemsAlreadyTaken(ResourceHarvestWOComponent harvest)
+    {
+        if (!regrowTickByItem.TryGetValue(harvest, out Dictionary<string, int> taken)) return null;
+
+        int now = Simulation(harvest).GetTick();
+        List<string> stillGone = taken.Where(entry => now < entry.Value).Select(entry => entry.Key).ToList();
+        return stillGone.Count == 0 ? null : stillGone;
     }
 
     // ---- the progress bar of choppable objects --------------------------------------

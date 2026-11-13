@@ -123,10 +123,10 @@ internal static class ChoppableAdapterPatches
 
         private static MethodBase TargetMethod() { return GameAccess.ChoppableFinish; }
 
-        private static bool Prefix(object __instance, string taskName, IVillagerTaskWorkHandler taskWorkHandler, ref bool __result)
+        private static bool Prefix(object __instance, string taskName, IVillagerTaskWorkHandler taskWorkHandler, VillagerNPCComponent villager, ref bool __result)
         {
             if (HarvestNames.ItemOfTask(taskName) == null) return true;
-            __result = HarvestWork.Finish(ManagedHarvest(__instance), taskName, taskWorkHandler);
+            __result = HarvestWork.Finish(ManagedHarvest(__instance), taskName, taskWorkHandler, villager);
             return false;
         }
     }

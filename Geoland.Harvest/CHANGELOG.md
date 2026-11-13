@@ -2,6 +2,11 @@
 
 > **About this file:** what changed in each version of Geoland.Harvest, newest first. Part of the Geoland library, unofficial mods for HavenCraft. Written with Claude, Anthropic's AI assistant, as the rest of the library was.
 
+## 0.9.0
+
+- **One visit takes everything that fits.** A villager who collects a work order's item from an object now also takes the object's other items in the same visit, if they have room to carry them: fiber and the wood from a bush, honey and the wax from a hive. What does not fit stays on the object for a later visit. Each work order is still judged by its own item, so a full store of one item does not stop the other being collected. The extra items do not count toward any target while they are being carried in this way, so a store can go over its "keep" amount. Setting: `TakeEverythingThatFits` (on by default).
+- **Picking by hand gives only what is left.** If a villager has already taken the fiber from a bush, harvesting it yourself gives the wood and not the fiber again. Before, a half-collected object gave everything a second time.
+
 ## 0.8.1
 
 - Wild bee nests and the giant berry bush are no longer harvested by villagers. They are found in the wild and cannot be made, so they are left to the player. Berry bushes, beehives, the plain bushes and wild cotton are harvested as before, through the same six work orders.

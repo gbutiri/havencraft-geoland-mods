@@ -46,7 +46,7 @@ internal sealed class HarvestTaskAdapter : IVillagerTaskWO
 
     public bool TryExecuteTaskFinish(string taskName, IVillagerTaskWorkHandler taskWorkHandler, WorkOrder workOrder, VillagerNPCComponent villager)
     {
-        return HarvestWork.Finish(harvest, taskName, taskWorkHandler);
+        return HarvestWork.Finish(harvest, taskName, taskWorkHandler, villager);
     }
 
     public float GetWorkProgressOverride()

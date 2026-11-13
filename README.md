@@ -92,12 +92,16 @@ Villagers harvest. Paint a Farm plot over berry bushes, beehives, plain bushes o
 | Gather Bush Wood | the plain bushes |
 | Gather Wild Cotton | wild cotton plants |
 
-- Each item is collected on its own. Taking the wax leaves the honey in the hive, and the other way round, and each order follows its own target.
+- Each order follows its own target and is judged by its own item alone. A full store of honey does not stop the wax being collected.
+- One visit takes everything that fits. A villager who collects an order's item from an object also takes the object's other items in the same visit, each only if all of it fits in their inventory: the wood along with the fiber from a bush, the wax along with the honey from a hive. What does not fit stays on the object for a later visit.
+- Items taken along in this way do not count against their own "keep" target, so a store can go over it.
 - Each item grows back on its own, after the object's normal refill time.
-- Which items have already been taken from an object is not saved. After loading, a full object offers all its items again. Harvesting by hand always gives everything.
+- Picking by hand an object a villager has partly collected gives only what is left on it.
+- Which items have already been taken from an object is not saved. After loading, a full object offers all its items again.
 - Wild bee nests and the giant berry bush are left to the player. Villagers do not harvest them.
+- Taking everything in one visit and hand-picking giving only what is left are new in 0.9.0 and have not yet been seen working in the game.
 
-Settings, in `geoland.havencraft.harvest.cfg`: one on/off switch for each kind of harvestable object. All are on by default. The file may not exist until a world has been loaded once. Its switches are named after the game's internal names for the kinds of object.
+Settings, in `geoland.havencraft.harvest.cfg`: in section `Behaviour`, `TakeEverythingThatFits` (default `true`). Set it to `false` and each order takes only its own item, leaving the rest on the object. In section `Harvest`, one on/off switch for each kind of harvestable object. All are on by default. The switches for the kinds of object are added to the file the first time a world is loaded. Its switches are named after the game's internal names for the kinds of object.
 
 If you remove the mod: a world saved with these work orders still loads, but that farm's work orders are reset to the game's defaults. This comes from reading how the game loads saves; it has not been tried.
 
@@ -144,12 +148,12 @@ Settings, in `geoland.havencraft.recruitwishes.cfg`: `Enabled` (default `true`) 
 
 Tested here means: seen working in the game by the author, on Alpha 6.0.5. The current versions were tidied up after much of that testing, without meaning to change what they do, so the list says which version each thing was seen with.
 
-All four mods, current versions, load cleanly on Alpha 6.0.5.
+All four mods load cleanly on Alpha 6.0.5. For Geoland.Harvest that was seen with 0.8.1; 0.9.0 has not yet been run in the game.
 
 | Mod | Seen working | Not yet seen |
 |---|---|---|
 | **Geoland.Planting** 0.8.1 | Planting berry bushes and fiber bushes (previous version; no change in behaviour intended since) | Planting wild cotton |
-| **Geoland.Harvest** 0.8.1 | A farm worker gathering berries up to the order's target, unloading and stopping (current version). Honey and wax collected (previous version) | The fiber, bush wood and wild cotton orders |
+| **Geoland.Harvest** 0.9.0 | A farm worker gathering berries up to the order's target, unloading and stopping (seen with 0.8.1). Honey and wax collected (seen with 0.8.0) | Anything with 0.9.0 itself. The fiber, bush wood and wild cotton orders. One visit taking everything that fits. Picking by hand giving only what is left |
 | **Geoland.PlotLevels** 0.5.1 | Beds above a shop counting for the home; painting on the second and third floors (previous version). Tiles showing while the painter is out (current version) | A villager sleeping in an upstairs bed |
 | **Geoland.RecruitWishes** 0.2.1 | Three travelers recruited through varied wishes (previous version) | A wish staying the same after saving and loading |
 
