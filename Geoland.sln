@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Geoland.PlotLevels", "Geola
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Geoland.RecruitWishes", "Geoland.RecruitWishes\Geoland.RecruitWishes.csproj", "{F15521D0-E2F4-4198-B6FD-50623B7C13A9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Geoland.Mines", "Geoland.Mines\Geoland.Mines.csproj", "{1C90D43B-E0CC-4C7C-B513-7D71B715A143}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -36,5 +38,9 @@ Global
 		{F15521D0-E2F4-4198-B6FD-50623B7C13A9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F15521D0-E2F4-4198-B6FD-50623B7C13A9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F15521D0-E2F4-4198-B6FD-50623B7C13A9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1C90D43B-E0CC-4C7C-B513-7D71B715A143}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1C90D43B-E0CC-4C7C-B513-7D71B715A143}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1C90D43B-E0CC-4C7C-B513-7D71B715A143}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1C90D43B-E0CC-4C7C-B513-7D71B715A143}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

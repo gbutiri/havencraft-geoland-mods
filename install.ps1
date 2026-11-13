@@ -7,9 +7,9 @@
 #   install.ps1                       find the game through Steam and install
 #   install.ps1 -GameDir "<folder>"   install into the folder that holds HavenCraft.exe
 #   install.ps1 -DryRun               say what would be done, and change nothing
-#   install.ps1 -Uninstall            remove the four Geoland mods again
+#   install.ps1 -Uninstall            remove the Geoland mods again
 #
-# The only files this script ever writes or deletes are the four Geoland DLLs in the
+# The only files this script ever writes or deletes are the Geoland DLLs in the
 # game's BepInEx\plugins folder (and that folder itself, if it does not exist yet).
 # It does not install BepInEx, the mod loader: that has to be in place first.
 #
@@ -24,7 +24,7 @@ param(
 
 $ErrorActionPreference = 'Stop'
 
-$ModNames = @('Geoland.Planting', 'Geoland.Harvest', 'Geoland.PlotLevels', 'Geoland.RecruitWishes')
+$ModNames = @('Geoland.Planting', 'Geoland.Harvest', 'Geoland.PlotLevels', 'Geoland.RecruitWishes', 'Geoland.Mines')
 $GameExe = 'HavenCraft.exe'
 $BepInExUrl = 'https://github.com/BepInEx/BepInEx/releases'
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
@@ -136,7 +136,7 @@ if (@(Get-Process -Name 'HavenCraft' -ErrorAction SilentlyContinue).Count -gt 0)
 
 $pluginsDir = Join-Path $GameDir 'BepInEx\plugins'
 
-# 3. Uninstall: remove the four Geoland DLLs and nothing else.
+# 3. Uninstall: remove the Geoland DLLs and nothing else.
 if ($Uninstall) {
     $removed = 0
     foreach ($name in $ModNames) {
