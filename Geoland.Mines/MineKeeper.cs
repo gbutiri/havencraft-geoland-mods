@@ -136,7 +136,7 @@ internal sealed class MineKeeper
                     // One mine that cannot be kept must not stop the others. It is left
                     // alone for the rest of this world's session, and the log says why.
                     if (mineByStakeId.TryGetValue(stakeId, out Mine failed)) failed.Failed = true;
-                    GameHook.Log.LogError(Describe(stake, plotId) + " is left alone after an error: " + e);
+                    GameHook.Log.LogError("The mine with stake " + stakeId + " on plot " + plotId + " is left alone after an error: " + e);
                 }
             }
         }

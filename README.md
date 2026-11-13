@@ -185,7 +185,7 @@ Settings, in `geoland.havencraft.recruitwishes.cfg`: `Enabled` (default `true`) 
 
 ### Geoland.Mines
 
-In the game, a rock that has been mined out is gone for good, so a village's stone runs out near home. This mod makes a mine out of two things the game already has: the Tree Stake, the craftable stake that woodcutters sow trees in, and the Miner Zone. A Tree Stake placed on a Miner Zone is a mine. One of the game's own rocks appears in the middle of it, your miners mine it, and some time after it is mined out the next one appears.
+In the game, a rock that has been mined out is gone for good, so a village's stone runs out near home. This mod makes a mine out of two things the game already has: the Tree Stake, the craftable stake that woodcutters sow trees in, and the Miner Zone. A Tree Stake placed on a Miner Zone is a mine. One of the game's own rocks appears in the middle of it for your miners to mine, and some time after it is mined out the next one appears.
 
 **This makes stone unlimited, which changes the game's balance.** How long a mine waits and which rock it gets are both settings, see below.
 
@@ -208,23 +208,22 @@ When you load a world that has a Miner Zone, a notice says that the mod is activ
 - **The wait starts when the mine is empty.** That is when the mod first sees an empty stake, and again each time a rock is gone. It makes no difference who broke the rock, a villager or you.
 - **The wait only runs while the game runs.** It is counted in the game's own ticks, which stop while the game is paused.
 - **The wait is not kept in the save.** After loading, an empty mine waits the whole time again. A mine that held a rock when you saved is expected to hold it still, because the game itself saves which stake holds what. This comes from reading the game's code; it has not been seen.
-- **You can still sow a sapling by hand in an empty mine.** The mine then waits until the sapling or the tree is gone, and after that for the usual time. No villager sows a mine.
+- **You can still sow a sapling by hand in an empty mine.** The mine then waits until the sapling or the tree is gone, and after that for the usual time. No villager sows a mine. This comes from reading the game's code; it has not been seen.
 - **The rocks are ordinary rocks.** The mod brings none of its own. It asks the game to place one of the rocks the game already has.
 - If you repaint the plot as something else, or take the stake away from the Miner Zone, it is no longer a mine. The mod does not remove a rock that is already there.
 - Nothing of the mod's is stored in the save, so the mod can be removed at any time.
-- The game may get mines of its own one day. This mod can simply be removed then.
 
 **Limits**
 
 - Villagers mining the rock in a stake has not yet been seen. See "What is tested and what is not".
 - The larger rocks, `rockA` and `rockB`, are two cells wide and may not fit inside the stake. They have not been tried.
-- Not tested in multiplayer. The mod is written to act only for the host of a game.
+- Not tested in multiplayer, and not expected to work for a guest in someone else's game.
 - The BepInEx log has a line for each rock placed and for each rock found gone, with the stake's position and the plot's number.
 
 Settings, in `geoland.havencraft.mines.cfg`, section `Mines`:
 
 - `Enabled` (default `true`). Set it to `false` and no rocks are placed.
-- `Rock` (default `rockC`): which of the game's rocks appears, by the game's internal name, or `random`. `rockC` is the medium rock and gives 45 stone. `rockD` and `rockE` are small and give 21 each. `random` picks afresh each time, a medium or a small rock with an even chance. `rockA` and `rockB` are two cells wide and give 65; they may not fit inside the stake and are never picked by `random`. Anything else is treated as `rockC`, with a line in the log.
+- `Rock` (default `rockC`): which of the game's rocks appears, by the game's internal name, or `random`. `rockC` is the medium rock and gives 45 stone. `rockD` and `rockE` are small and give 21 each. `random` picks afresh each time, a medium or a small rock with an even chance. `rockA` and `rockB` are two cells wide and give 65; they may not fit inside the stake and are never picked by `random`. Anything else is treated as `rockC`, with a line in the log. If a game update removes the rock you named, the mod uses whichever of the one-cell rocks the game still has.
 - `WaitTicks` (default `21000`): how long an empty mine waits for its next rock, in game ticks. The game counts 100 ticks a second while it is not paused. The default is three and a half minutes of play, a little under three and a half hours on the game's clock at its usual day length. Values below 100 are treated as 100.
 
 ## What is tested and what is not
@@ -239,7 +238,7 @@ The first four mods, current versions, load cleanly on Alpha 6.0.5. Geoland.Mine
 | **Geoland.Harvest** 0.9.1 | Villagers harvesting through a day of play (0.9.1). All of this in 0.9.0. All six work orders: berries, honey, wax, fiber, bush wood and wild cotton. Each order taking only its own item and all of it: wax taken and the honey left for the next visit; both fibers from a bush. Picking a half-collected object by hand giving only what is left. Wild cotton still being picked in winter. With the one-visit setting on, a worker clearing a whole bush in one visit | Everything new in 0.9.1: an item staying on the object when the worker has no room for it. A worker who cannot unload moving on to another order |
 | **Geoland.PlotLevels** 0.5.2 | A home above a shop, and a home above a tavern, built from nothing: picking the plot, painting the upstairs floor, repainting and removing paint, villagers assigned to work downstairs and to live upstairs (0.5.1). Tiles showing while the painter is out (0.5.1). Painting and erasing upstairs, and a stroke staying on the kind of floor it began on (0.5.2). A plot erased down to nothing on the ground losing its upstairs floor with it, and a bed on that floor counting for the home again as soon as the floor was repainted (0.5.2). Levels loaded from a save (0.5.2). A building with a different plot on each of three floors, painted from nothing (0.5.2) | No levels made on the ground floor of a slope; the tiles redrawn after an erase that changes no owner; the key switched off with `None`. Erasing on a third floor |
 | **Geoland.RecruitWishes** 0.2.1 | Travelers recruited through varied wishes; wishes staying the same across saving and loading, as far as the author has tried (current version) | |
-| **Geoland.Mines** 0.1.2 | All of this in 0.1.0, with the rocks broken by the player by hand: the mod loading cleanly beside the other four. A Tree Stake placed on a Miner Zone. The rock appearing after the wait. A new rock appearing after the last was broken, six times in a row at one stake | A villager mining a rock in a stake. This is what the mod is for; from the game's code it should work. The medium rock and the `random` setting (new in 0.1.1 and 0.1.2, not yet run). The rock still in its stake after saving and loading. A larger rock inside a stake |
+| **Geoland.Mines** 0.1.2 | All of this in 0.1.0, with the rocks broken by the player by hand: the mod loading cleanly beside the other four. A Tree Stake placed on a Miner Zone. The rock appearing after the wait. A new rock appearing after the last was broken, six times in a row at one stake | A villager mining a rock in a stake. This is what the mod is for; from the game's code it should work. The medium rock and the `random` setting (new in 0.1.1 and 0.1.2, not yet run). The rock still in its stake after saving and loading. A sapling sown by hand in an empty mine. A larger rock inside a stake |
 
 Also not yet seen: the mods' names appearing in the game's error report.
 

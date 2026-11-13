@@ -72,7 +72,7 @@ internal static class RockChoice
         }
         if (usable.Count > 0) return usable.ToArray();
 
-        GameHook.Log.LogError("The game has changed: it has none of the rocks " + string.Join(", ", randomDraw)
+        GameHook.Log.LogError("The game has changed: it has none of the rocks " + string.Join(", ", new HashSet<string>(randomDraw))
             + ". Mines place no rocks. Look for a newer version of the plugin.");
         return null;
     }

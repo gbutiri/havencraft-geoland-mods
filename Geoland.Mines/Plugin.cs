@@ -15,7 +15,8 @@
 // starts. It reads the settings and checks that the one private part of the game the
 // plugin relies on is still there (GameAccess). The plugin has no patches of its own.
 // Everything else runs from MinesMod, on the game's own "world loaded" and "every frame"
-// calls. None of this has been run in the game yet; it is read in the game's code.
+// calls. Version 0.1.0 was run in the game: stakes got their rocks and the next ones
+// followed. Villagers mining a rock in a stake is read in the game's code, not yet seen.
 using BepInEx;
 using BepInEx.Configuration;
 using Geoland.Shared;

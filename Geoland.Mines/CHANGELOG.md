@@ -4,7 +4,7 @@
 
 ## 0.1.2
 
-- The default rock is the medium one (`rockC`, 45 stone). `random` stays as an option of the `Rock` setting. In 0.1.1, which was not released, random was the default.
+- The default rock is the medium one (`rockC`, 45 stone). `random` stays as an option of the `Rock` setting. In 0.1.1 random was the default. Neither 0.1.0 nor 0.1.1 was released; 0.1.2 is the first version published.
 - A `Rock` setting the plugin does not know is replaced by the medium rock.
 
 ## 0.1.1
