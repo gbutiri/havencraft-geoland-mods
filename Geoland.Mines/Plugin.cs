@@ -28,7 +28,7 @@ public sealed class Plugin : BaseUnityPlugin
     /// <summary>Names the plugin to the mod loader, and names its settings file.</summary>
     public const string Id = "geoland.havencraft.mines";
     public const string Name = "Geoland.Mines";
-    public const string Version = "0.1.0";
+    public const string Version = "0.1.1";
 
     private const string SettingsSection = "Mines";
 
@@ -43,10 +43,11 @@ public sealed class Plugin : BaseUnityPlugin
         Enabled = Config.Bind(SettingsSection, "Enabled", true,
             "Keep a rock standing in every Tree Stake that is placed on a Miner Zone. Tree Stakes on other plots are never touched.");
         Rock = Config.Bind(SettingsSection, "Rock", RockChoice.Default,
-            "Which of the game's rocks appears in a mine, by its internal name. "
-            + "rockE and rockD are small and give 21 stone each. rockC is larger and gives 45. "
-            + "rockA and rockB are two cells wide, give 65, and may not fit inside the stake. "
-            + "Any other name is replaced by " + RockChoice.Default + ", with a line in the log.");
+            "Which of the game's rocks appears in a mine: random, or one rock by its internal name. "
+            + "random (the default) picks afresh each time, a medium or a small rock with an even chance. "
+            + "rockC is the medium rock and gives 45 stone. rockD and rockE are small and give 21 each. "
+            + "rockA and rockB are two cells wide, give 65, may not fit inside the stake, and are never picked by random. "
+            + "Anything else is treated as random, with a line in the log.");
         WaitTicks = Config.Bind(SettingsSection, "WaitTicks", MineKeeper.DefaultWaitTicks,
             "How long an empty mine waits before its next rock appears, in game ticks. The game counts 100 ticks a second "
             + "while it is not paused. The default, 21000, is the time a berry bush takes to refill: three and a half minutes "

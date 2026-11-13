@@ -2,6 +2,13 @@
 
 > **About this file:** what changed in each version of Geoland.Mines, newest first. Part of the Geoland library, unofficial mods for HavenCraft. Written with Claude, Anthropic's AI assistant, as the rest of the library was.
 
+## 0.1.1
+
+- The rocks are random by default: each new rock in a mine is a medium rock (45 stone) or a small one (21 stone), with an even chance. Before, every rock was the smallest.
+- The `Rock` setting takes `random` or one rock's name. A settings file written by 0.1.0 still says `rockE`; change it to `random` to get the new default.
+- 0.1.0 was seen working in the game by the author: a Tree Stake on a Miner Zone got its rock after the wait, and the next one after that was mined out. Villagers mining the rock has not yet been seen.
+- One mine that cannot be kept no longer stops the others.
+
 ## 0.1.0
 
 - First version. It builds, but it has not yet been run in the game: everything below is what the code is written to do, from reading the game's code.

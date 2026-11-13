@@ -38,8 +38,8 @@ internal sealed class MinesMod : IMod
         try
         {
             WorldObjectModule worldObjects = GameHook.Module<WorldObjectModule>();
-            string rockName = RockChoice.FromSettings(worldObjects);
-            if (rockName == null) return;
+            string[] rocks = RockChoice.FromSettings(worldObjects);
+            if (rocks == null) return;
 
             int waitTicks = Plugin.WaitTicks.Value;
             if (waitTicks < MineKeeper.ShortestWaitTicks)
@@ -50,9 +50,9 @@ internal sealed class MinesMod : IMod
 
             players = GameHook.Module<PlayerCharacterModule>();
             keeper = new MineKeeper(GameHook.Module<PlotModule>(), worldObjects, GameHook.Module<SimulationModule>(),
-                rockName, waitTicks);
+                rocks, waitTicks);
             nextLook = Time.unscaledTime + LookSeconds;
-            GameHook.Log.LogInfo("Mines are ready for this world: " + rockName + " after " + waitTicks + " ticks");
+            GameHook.Log.LogInfo("Mines are ready for this world: " + RockChoice.Describe(rocks) + " after " + waitTicks + " ticks");
 
             // The main menu loads a world too, with no player in it. Say nothing there,
             // and nothing in a world that has no Miner Zone to put a mine on.

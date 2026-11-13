@@ -64,7 +64,8 @@ internal sealed class MineKeeper
     private readonly PlotModule plots;
     private readonly WorldObjectModule worldObjects;
     private readonly SimulationModule simulation;
-    private readonly string rockName;
+    private readonly string[] rocks;
+    private readonly System.Random dice = new System.Random();
     private readonly int waitTicks;
 
     private readonly Dictionary<uint, Mine> mineByStakeId = new Dictionary<uint, Mine>();
@@ -74,12 +75,12 @@ internal sealed class MineKeeper
     private readonly HashSet<uint> stakeIdsSeen = new HashSet<uint>();
     private readonly List<uint> stakeIdsToForget = new List<uint>();
 
-    internal MineKeeper(PlotModule plots, WorldObjectModule worldObjects, SimulationModule simulation, string rockName, int waitTicks)
+    internal MineKeeper(PlotModule plots, WorldObjectModule worldObjects, SimulationModule simulation, string[] rocks, int waitTicks)
     {
         this.plots = plots;
         this.worldObjects = worldObjects;
         this.simulation = simulation;
-        this.rockName = rockName;
+        this.rocks = rocks;
         this.waitTicks = waitTicks;
     }
 
@@ -194,6 +195,10 @@ internal sealed class MineKeeper
         // handed that rock, and no second one is placed on top of it.
         WorldObject rock = RockStandingAt(plotId, spot.pos);
         bool rockWasThere = rock.IsValid();
+
+        // With the "random" setting there are several rocks to draw from; with a named
+        // rock there is one.
+        string rockName = rocks[dice.Next(rocks.Length)];
         if (!rockWasThere) rock = worldObjects.SpawnWorldObject(rockName, spot);
 
         field.SetPlantObject(rock);
