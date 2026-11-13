@@ -13,8 +13,10 @@
 //
 // The adapter's class is not public, so the patches receive it as a plain object and
 // reach the world object through the interface it implements.
+using System;
 using System.Collections.Generic;
 using System.Reflection;
+using Geoland.Shared;
 using HarmonyLib;
 
 namespace Geoland.Harvest;
@@ -23,6 +25,18 @@ internal static class ChoppableAdapterPatches
 {
     // Tells the game to show the villager's own work time as the progress.
     private const float NoProgressOfItsOwn = -1f;
+
+    private static bool failureLogged;
+
+    // These patches answer the work planner, which asks about every tree and rock. An
+    // error must not reach it, and must not fill the log: the first one is written down,
+    // and each patch then gives the answer that leaves the game's own behaviour standing.
+    private static void LogFailure(string question, Exception e)
+    {
+        if (failureLogged) return;
+        failureLogged = true;
+        GameHook.Log.LogError("Answering the work planner (" + question + ") failed; shown once: " + e);
+    }
 
     private static WorldObject ObjectOf(object adapter)
     {
@@ -52,8 +66,16 @@ internal static class ChoppableAdapterPatches
         private static void Postfix(object __instance, string taskName, ref bool __result)
         {
             if (HarvestNames.ItemOfTask(taskName) == null) return;
-            ResourceHarvestWOComponent harvest = ManagedHarvest(__instance);
-            __result = harvest != null && HarvestWork.CanDo(harvest, taskName);
+            try
+            {
+                ResourceHarvestWOComponent harvest = ManagedHarvest(__instance);
+                __result = harvest != null && HarvestWork.CanDo(harvest, taskName);
+            }
+            catch (Exception e)
+            {
+                __result = false;
+                LogFailure("can you do this task", e);
+            }
         }
     }
 
@@ -69,10 +91,18 @@ internal static class ChoppableAdapterPatches
 
         private static bool Prefix(object __instance, List<ItemAmount> outAmounts)
         {
-            ResourceHarvestWOComponent harvest = ManagedHarvest(__instance);
-            if (harvest == null) return true;
-            HarvestWork.AddYield(harvest, outAmounts);
-            return false;
+            try
+            {
+                ResourceHarvestWOComponent harvest = ManagedHarvest(__instance);
+                if (harvest == null) return true;
+                HarvestWork.AddYield(harvest, outAmounts);
+                return false;
+            }
+            catch (Exception e)
+            {
+                LogFailure("what would you yield", e);
+                return true;
+            }
         }
     }
 
@@ -91,9 +121,18 @@ internal static class ChoppableAdapterPatches
             string item = HarvestNames.ItemOfTask(taskName);
             if (item == null) return true;
 
-            bool nothingLeftToTake = !HarvestWork.IsAvailable(ManagedHarvest(__instance), item);
-            __result = nothingLeftToTake;
-            if (!nothingLeftToTake) HarvestWork.WorkedOn(ObjectOf(__instance));
+            // Whatever happens, a harvest task must never reach the game's chopping.
+            try
+            {
+                bool nothingLeftToTake = !HarvestWork.IsAvailable(ManagedHarvest(__instance), item);
+                __result = nothingLeftToTake;
+                if (!nothingLeftToTake) HarvestWork.WorkedOn(ObjectOf(__instance));
+            }
+            catch (Exception e)
+            {
+                __result = true;
+                LogFailure("do some of the work", e);
+            }
             return false;
         }
     }
@@ -110,7 +149,14 @@ internal static class ChoppableAdapterPatches
 
         private static void Postfix(object __instance, ref float __result)
         {
-            if (HarvestWork.ShowsHarvestProgress(ObjectOf(__instance))) __result = NoProgressOfItsOwn;
+            try
+            {
+                if (HarvestWork.ShowsHarvestProgress(ObjectOf(__instance))) __result = NoProgressOfItsOwn;
+            }
+            catch (Exception e)
+            {
+                LogFailure("how far along is the work", e);
+            }
         }
     }
 
@@ -123,10 +169,20 @@ internal static class ChoppableAdapterPatches
 
         private static MethodBase TargetMethod() { return GameAccess.ChoppableFinish; }
 
-        private static bool Prefix(object __instance, string taskName, IVillagerTaskWorkHandler taskWorkHandler, VillagerNPCComponent villager, ref bool __result)
+        // The parameter names are the game's; that is how the patch is handed them.
+        private static bool Prefix(object __instance, string taskName, IVillagerTaskWorkHandler taskWorkHandler,
+            VillagerNPCComponent villager, ref bool __result)
         {
             if (HarvestNames.ItemOfTask(taskName) == null) return true;
-            __result = HarvestWork.Finish(ManagedHarvest(__instance), taskName, taskWorkHandler, villager);
+            try
+            {
+                __result = HarvestWork.Finish(ManagedHarvest(__instance), taskName, handOver: taskWorkHandler, worker: villager);
+            }
+            catch (Exception e)
+            {
+                __result = false;
+                LogFailure("the work is done", e);
+            }
             return false;
         }
     }

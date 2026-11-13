@@ -14,6 +14,8 @@
 // Recipe names begin with "zz" because the game numbers its recipes in alphabetical
 // order of their names. Sorting last leaves every one of the game's own recipes with
 // the number it has without the plugin.
+using System;
+
 namespace Geoland.Harvest;
 
 internal static class HarvestNames
@@ -47,7 +49,7 @@ internal static class HarvestNames
     /// <summary>The item a task collects, or null if the task is not one of this plugin's.</summary>
     internal static string ItemOfTask(string taskName)
     {
-        if (taskName == null || !taskName.StartsWith(TaskPrefix)) return null;
+        if (taskName == null || !taskName.StartsWith(TaskPrefix, StringComparison.Ordinal)) return null;
         return taskName.Substring(TaskPrefix.Length);
     }
 
@@ -75,7 +77,7 @@ internal static class HarvestNames
     internal static string ItemOfTitleCode(string code)
     {
         const string prefix = TitleCodePrefix + RecipePrefix;
-        if (code == null || !code.StartsWith(prefix)) return null;
+        if (code == null || !code.StartsWith(prefix, StringComparison.Ordinal)) return null;
         return code.Substring(prefix.Length);
     }
 
@@ -85,7 +87,7 @@ internal static class HarvestNames
     /// </summary>
     internal static string ItemOfOldRecipe(string recipeName)
     {
-        if (recipeName == null || !recipeName.StartsWith(OldRecipePrefix)) return null;
+        if (recipeName == null || !recipeName.StartsWith(OldRecipePrefix, StringComparison.Ordinal)) return null;
         switch (recipeName)
         {
             // The first three work orders had names of their own.
@@ -93,7 +95,7 @@ internal static class HarvestNames
             case "zzhh_collectHoney": return "honey";
             case "zzhh_harvest_fiber_wood": return "fiber";
         }
-        if (!recipeName.StartsWith(OldGenericRecipePrefix)) return null;
+        if (!recipeName.StartsWith(OldGenericRecipePrefix, StringComparison.Ordinal)) return null;
         return recipeName.Substring(OldGenericRecipePrefix.Length);
     }
 }

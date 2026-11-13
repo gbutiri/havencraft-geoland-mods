@@ -36,6 +36,13 @@ internal sealed class LevelSavePart : ISavable
     private static SaveModule registeredWith;
 
     private LevelSaveData prepared;
+    private LevelSaveData lastPrepared;
+
+    /// <summary>
+    /// The plot module of the world this part belongs to, noted when the world is created
+    /// (SaveRegistrationPatches). Null between worlds.
+    /// </summary>
+    internal static PlotModule Plots { get; set; }
 
     /// <summary>The save file the game is loading, noted when the load starts (SaveRegistrationPatches).</summary>
     internal static string SaveBeingLoaded { get; set; }
@@ -59,6 +66,7 @@ internal sealed class LevelSavePart : ISavable
         {
             registered = null;
             registeredWith = null;
+            Plots = null;
         }
     }
 
@@ -83,9 +91,23 @@ internal sealed class LevelSavePart : ISavable
         return false;
     }
 
+    // The game calls this for every part in turn and does not catch what a part throws:
+    // an error here would stop the whole save. So nothing may leave this method. If the
+    // levels cannot be prepared, the levels of the last good save are written again,
+    // which is better than a save without any.
     public void PrepareSaveMainThread()
     {
-        prepared = LevelMap.ToSaveData(GameHook.Module<PlotModule>());
+        try
+        {
+            prepared = LevelMap.ToSaveData(Plots ?? GameHook.Module<PlotModule>());
+            lastPrepared = prepared;
+        }
+        catch (Exception e)
+        {
+            prepared = lastPrepared;
+            GameHook.Log.LogError("Could not prepare the plot levels for saving. This save holds the levels as they were at the last good save"
+                + (lastPrepared == null ? " (none)" : "") + ": " + e);
+        }
     }
 
     public void PrepareSaveParallel()

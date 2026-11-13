@@ -40,7 +40,7 @@ public sealed class Plugin : BaseUnityPlugin
     /// <summary>Names the plugin to the mod loader, and names its settings file.</summary>
     public const string Id = "geoland.havencraft.plotlevels";
     public const string Name = "Geoland.PlotLevels";
-    public const string Version = "0.5.1";
+    public const string Version = "0.5.2";
 
     /// <summary>The default for <see cref="MinHeightAboveGround"/>, in blocks.</summary>
     internal const int DefaultMinHeightAboveGround = 2;

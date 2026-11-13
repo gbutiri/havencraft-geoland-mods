@@ -11,6 +11,15 @@
 // or a menu. Planting needs all four. They are found by name once, at start-up. If a game
 // update renames or removes one, the log says so and planting stays switched off; the
 // game then behaves exactly as it does without the plugin.
+//
+// A second, separate group makes a new plant start empty. The game creates an object
+// that grows wild already full, and one the player builds empty, with its refill timer
+// running. A planted bush is the game's wild object, so it would appear full, and the
+// one item it cost would come straight back with more. The harvestable part of an object
+// keeps its fullness and its timer private; these reaches set them the way the game
+// itself does for a built object. If a game update removes one of them, the log says so
+// and planting still works: the plants simply appear full.
+using System;
 using System.Reflection;
 using Geoland.Shared;
 
@@ -19,8 +28,13 @@ namespace Geoland.Planting;
 internal static class GameAccess
 {
     private const string NeededFor = "planting";
+    private const string NeededForStartingEmpty = "a new plant starting empty (plants will appear full)";
 
     private static FieldInfo inputModule;
+    private static FieldInfo harvestDescription;
+    private static FieldInfo harvestSimulation;
+    private static FieldInfo harvestRefillTick;
+    private static MethodInfo harvestSetIsFull;
 
     /// <summary>Handles one click of "use item" or "interact".</summary>
     internal static MethodInfo ClickHandler { get; private set; }
@@ -44,6 +58,34 @@ internal static class GameAccess
         ClickHandler = GameMembers.Method(typeof(PlayerActionModule), "HandleConfirmAction", NeededFor);
         ButtonHeldHandler = GameMembers.Method(typeof(PlayerActionModule), "HandleConfirmPressed", NeededFor);
         ButtonReleasedHandler = GameMembers.Method(typeof(PlayerActionModule), "HandleConfirmReleased", NeededFor);
+
+        Type harvest = typeof(ResourceHarvestWOComponent);
+        harvestDescription = GameMembers.Field(harvest, "desc", typeof(ResourceHarvestWOCDescription), NeededForStartingEmpty);
+        harvestSimulation = GameMembers.Field(harvest, "simulationModule", typeof(SimulationModule), NeededForStartingEmpty);
+        harvestRefillTick = GameMembers.Field(harvest, "refillTick", typeof(int), NeededForStartingEmpty);
+        harvestSetIsFull = GameMembers.Method(harvest, "SetIsFull", NeededForStartingEmpty);
+    }
+
+    /// <summary>False when a new plant cannot be made to start empty. Planting still works.</summary>
+    internal static bool CanStartEmpty
+    {
+        get { return harvestDescription != null && harvestSimulation != null && harvestRefillTick != null && harvestSetIsFull != null; }
+    }
+
+    /// <summary>
+    /// Empties a harvestable object that was just created and starts its refill timer:
+    /// the same three steps the game takes for an object the player builds.
+    /// </summary>
+    internal static void StartEmpty(ResourceHarvestWOComponent harvest)
+    {
+        var description = (ResourceHarvestWOCDescription)harvestDescription.GetValue(harvest);
+        var simulation = (SimulationModule)harvestSimulation.GetValue(harvest);
+
+        const bool full = false;
+        const bool evenIfUnchanged = false;
+        harvestSetIsFull.Invoke(harvest, new object[] { full, evenIfUnchanged });
+        harvestRefillTick.SetValue(harvest, simulation.GetTick() + description.regenerateTicks);
+        simulation.AddTickUpdate(harvest, description.regenerateTicks);
     }
 
     /// <summary>The game's input module, as held by the player action module.</summary>

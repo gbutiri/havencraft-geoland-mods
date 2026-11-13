@@ -32,6 +32,7 @@ internal sealed class PlantingMod : IMod
 
     private bool plantingMode;
     private bool ghostFailed;
+    private bool startEmptyFailed;
 
     public void OnGameLoaded(Game game)
     {
@@ -141,7 +142,8 @@ internal sealed class PlantingMod : IMod
         {
             return "No " + plantable.ItemPlural + " left to plant.";
         }
-        worldObjects.SpawnWorldObject(plantable.ObjectName, spot);
+        WorldObject planted = worldObjects.SpawnWorldObject(plantable.ObjectName, spot);
+        StartEmpty(planted);
         spots.TurnNextPlant();
         spots.ForgetLastScan();   // the new plant now stands on this cell
 
@@ -150,13 +152,34 @@ internal sealed class PlantingMod : IMod
         return $"{plantable.Label} planted. {Capitalised(plantable.ItemPlural)} left: {left}.";
     }
 
+    // A new plant starts empty and grows its first crop, as an object the player builds
+    // does. Left as the game creates it, it would be full at once, and planting one fiber
+    // would hand back two. If this fails the plant is still planted; it is only full.
+    private void StartEmpty(WorldObject planted)
+    {
+        if (startEmptyFailed || !GameAccess.CanStartEmpty) return;
+        try
+        {
+            ResourceHarvestWOComponent harvest = planted.TryGetComponent<ResourceHarvestWOComponent>();
+            if (harvest != null && harvest.IsFull()) GameAccess.StartEmpty(harvest);
+        }
+        catch (Exception e)
+        {
+            startEmptyFailed = true;
+            GameHook.Log.LogError("Could not make a new plant start empty; from now on plants appear full: " + e);
+        }
+    }
+
     // The toggle key counts only while the keyboard belongs to the game world: not while
     // typing in chat or another text field, and not while a menu is open. The game does
     // not filter raw key presses for us, so its input module is asked.
     private bool ToggleKeyPressed()
     {
+        // "None" in the settings file switches the key off. The keyboard cannot be asked
+        // about that key: it throws.
+        Key key = Plugin.ToggleKey.Value;
         Keyboard keyboard = Keyboard.current;
-        if (keyboard == null || !keyboard[Plugin.ToggleKey.Value].wasPressedThisFrame) return false;
+        if (key == Key.None || keyboard == null || !keyboard[key].wasPressedThisFrame) return false;
         if (input != null && (input.IsTextFieldActive() || input.modalManager.IsGameModal())) return false;
         return true;
     }

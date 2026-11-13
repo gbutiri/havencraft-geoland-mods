@@ -147,6 +147,7 @@ internal static class LevelMap
     {
         var plotsAffected = new HashSet<ushort>();
         int changed = 0;
+        bool levelRemoved = false;
         foreach (Vector2Int cell in brush)
         {
             int index = CellIndex(plots, cell.x, cell.y);
@@ -166,24 +167,48 @@ internal static class LevelMap
             Tidy(index, levels);
 
             if (before == ground && !hadLevelStartingHere) continue;
+            levelRemoved = true;
             plotsAffected.Add(before);
             plotsAffected.Add(ground);
             if (before != ground) changed++;
         }
+
+        // A level can go without any cell changing hands: one that gave a floor to the
+        // plot the ground already has. Nothing needs re-filing then, but the overlay
+        // must still redraw.
         if (changed > 0) LevelsChanged(plots, plotsAffected);
+        else if (levelRemoved) Version++;
         return changed;
     }
 
-    /// <summary>A plot was deleted: its levels go with it.</summary>
-    internal static void PlotRemoved(PlotInfo removed)
+    /// <summary>
+    /// Removes every level that gives space to this plot. Raises no event: it is called
+    /// just before the game announces the change itself (PlotEmptiedPatch).
+    /// </summary>
+    /// <returns>How many levels were removed.</returns>
+    internal static int DropLevelsOf(ushort plot)
     {
-        Version++;
+        int dropped = 0;
         foreach (int index in levelsByCell.Keys.ToList())
         {
             List<PlotLevel> levels = levelsByCell[index];
-            levels.RemoveAll(level => level.Plot == removed.id);
+            int removed = levels.RemoveAll(level => level.Plot == plot);
+            if (removed == 0) continue;
+
+            dropped += removed;
             Tidy(index, levels);
         }
+        if (dropped > 0) Version++;
+        return dropped;
+    }
+
+    /// <summary>
+    /// A plot was destroyed. Its levels are normally gone by now (PlotEmptiedPatch); this
+    /// makes sure no level is left pointing at a plot number the game will hand out again.
+    /// </summary>
+    internal static void PlotRemoved(PlotInfo removed)
+    {
+        DropLevelsOf(removed.id);
     }
 
     /// <summary>Removes levels that point at a plot the world no longer has.</summary>

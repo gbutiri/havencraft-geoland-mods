@@ -169,8 +169,12 @@ internal static class HarvestWork
     /// on the object it is emptied the game's way; otherwise the item grows back on its
     /// own while the rest stays.
     /// </summary>
-    /// <returns>False if the item was no longer there, so nothing was handed over.</returns>
-    internal static bool Finish(ResourceHarvestWOComponent harvest, string taskName, IVillagerTaskWorkHandler villager, VillagerNPCComponent worker)
+    /// <returns>
+    /// False if nothing was taken: the item was no longer there, or the worker could not
+    /// carry it. It then stays on the object for a later visit.
+    /// </returns>
+    internal static bool Finish(ResourceHarvestWOComponent harvest, string taskName, IVillagerTaskWorkHandler handOver,
+        VillagerNPCComponent worker)
     {
         string item = HarvestNames.ItemOfTask(taskName);
         if (!IsAvailable(harvest, item)) return false;
@@ -181,10 +185,14 @@ internal static class HarvestWork
         {
             if (stack.item.itemName == item) yield.Add(new ItemAmount(stack.item, stack.amount));
         }
-        if (!villager.TryAddWorkOutputItems(yield))
+
+        // The game's hand-over puts in what fits and drops the rest. So the room is
+        // checked first: an item is taken whole or left on the object whole.
+        if (!HasRoomFor(worker, yield) || !handOver.TryAddWorkOutputItems(yield))
         {
-            GameHook.Log.LogError("A villager could not carry all the " + item + " from "
-                + harvest.GetWorldObject().description.worldObjectName);
+            GameHook.Log.LogInfo("A villager had no room for the " + item + " on "
+                + harvest.GetWorldObject().description.worldObjectName + "; it stays there.");
+            return false;
         }
 
         SimulationModule clock = Simulation(harvest);
@@ -207,6 +215,15 @@ internal static class HarvestWork
             GameAccess.EmptyAndStartRefill(harvest, clock, description.regenerateTicks);
         }
         return true;
+    }
+
+    // True when the worker's inventory can take all of every amount. When the inventory
+    // cannot be asked, the answer is yes and the game's hand-over decides.
+    private static bool HasRoomFor(VillagerNPCComponent worker, List<ItemAmount> amounts)
+    {
+        ItemContainer inventory = worker == null ? null : worker.TryGetInventory();
+        if (inventory == null) return true;
+        return amounts.All(amount => inventory.GetSpaceForItem(amount.item) >= amount.amount);
     }
 
     // One visit, everything that fits. The work order's own item has just been handed

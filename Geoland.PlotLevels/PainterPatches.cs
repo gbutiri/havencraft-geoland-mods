@@ -9,10 +9,19 @@
 // applies the brush to the game's flat plot grid.
 //  - After the first step, the brush is put on the upstairs floor being aimed at, if
 //    there is one (PainterAim).
-//  - The second step is taken over while the brush is upstairs: instead of changing
-//    the ground grid, the stroke paints or erases an upper level (PlotLevelsMod).
-// Aimed at the ground floor or the terrain, both steps run exactly as the game made
-// them.
+//  - The second step is taken over for a stroke that began upstairs: instead of
+//    changing the ground grid, the stroke paints or erases an upper level
+//    (PlotLevelsMod).
+// A stroke that began on the ground floor or the terrain runs exactly as the game made
+// it.
+//
+// A stroke stays on the kind of floor it began on. The game chooses a stroke's plot
+// once, at the click, from its ground grid. If the takeover were decided frame by frame,
+// a stroke begun upstairs and dragged onto a wall or past the floor's edge would be
+// handed back to the game half way, and the game would paint or erase the ground with a
+// plot chosen for another purpose. So a stroke that began upstairs does nothing while
+// the brush is off the upstairs floors, and a stroke that began on the ground does
+// nothing while the brush is on one.
 using System;
 using System.Reflection;
 using Geoland.Shared;
@@ -23,6 +32,17 @@ namespace Geoland.PlotLevels;
 
 internal static class PainterPatches
 {
+    private enum StrokeOn
+    {
+        NoStroke,
+        Ground,
+        Upstairs,
+    }
+
+    // The stroke in progress, and the last frame in which the painter was in use.
+    private static StrokeOn stroke;
+    private static int lastPainterFrame = -1;
+
     [HarmonyPatch]
     private static class BrushPositionWorkedOut
     {
@@ -42,6 +62,15 @@ internal static class PainterPatches
         {
             PainterAim.PutBrushOnFloor(brushSize, ref brushPos, ref brushPosInt, ref lastBrushPosUpdateFrame,
                 ref validBrushPos, brushDecalGameObject, raycastCollisionModule);
+
+            // The stroke is over once neither the paint nor the erase button is held.
+            lastPainterFrame = Time.frameCount;
+            PlotLevelsMod mod = PlotLevelsMod.Current;
+            if (stroke != StrokeOn.NoStroke && (mod == null || !mod.StrokeButtonHeld()))
+            {
+                stroke = StrokeOn.NoStroke;
+                mod?.StrokeEnded();
+            }
         }
     }
 
@@ -62,17 +91,28 @@ internal static class PainterPatches
         private static bool Prefix(object __instance)
         {
             PlotLevelsMod mod = PlotLevelsMod.Current;
-            if (!PainterAim.IsUpstairs || mod == null) return true;
+            if (mod == null) return true;
+
+            bool upstairs = PainterAim.IsUpstairs;
             try
             {
-                mod.PainterStroke(erase: GameAccess.PainterIsErasing(__instance));
+                // A new stroke: a button went down this frame, or none was being
+                // followed, or the painter was put away in between.
+                bool painterWasAway = Time.frameCount > lastPainterFrame + 1;
+                if (stroke == StrokeOn.NoStroke || painterWasAway || mod.StrokeStartsThisFrame())
+                {
+                    stroke = upstairs ? StrokeOn.Upstairs : StrokeOn.Ground;
+                }
+                if (stroke == StrokeOn.Ground) return !upstairs;
+                if (upstairs) mod.PainterStroke(erase: GameAccess.PainterIsErasing(__instance));
             }
             catch (Exception e)
             {
                 GameHook.Log.LogError("Painting an upper level failed: " + e);
             }
 
-            // Whatever happened, an upstairs click must never change the ground grid.
+            // Whatever happened, a stroke that is not a ground stroke must never change
+            // the ground grid.
             return false;
         }
     }

@@ -27,7 +27,7 @@ public sealed class Plugin : BaseUnityPlugin
     /// <summary>Names the plugin to the mod loader, and names its settings file.</summary>
     public const string Id = "geoland.havencraft.planting";
     public const string Name = "Geoland.Planting";
-    public const string Version = "0.8.1";
+    public const string Version = "0.8.2";
 
     private const string SettingsSection = "Planting";
 

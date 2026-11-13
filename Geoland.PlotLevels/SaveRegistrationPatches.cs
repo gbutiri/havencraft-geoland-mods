@@ -50,6 +50,7 @@ internal static class SaveRegistrationPatches
 
         private static void Postfix(PlotModule __instance)
         {
+            LevelSavePart.Plots = __instance;
             __instance.onPlotRemoved += LevelMap.PlotRemoved;
         }
     }
@@ -63,8 +64,12 @@ internal static class SaveRegistrationPatches
             return GameAccess.CanKeepLevels;
         }
 
-        private static void Prefix()
+        private static void Prefix(PlotModule __instance)
         {
+            // Only the world the levels belong to. Should the game ever create the next
+            // world's plot module before it destroys the last one's, the new world's
+            // levels must not be thrown away with the old.
+            if (LevelSavePart.Plots != null && LevelSavePart.Plots != __instance) return;
             try
             {
                 LevelSavePart.Unregister();

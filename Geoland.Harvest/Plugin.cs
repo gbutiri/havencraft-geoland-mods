@@ -29,7 +29,7 @@ public sealed class Plugin : BaseUnityPlugin
     /// <summary>Names the plugin to the mod loader, and names its settings file.</summary>
     public const string Id = "geoland.havencraft.harvest";
     public const string Name = "Geoland.Harvest";
-    public const string Version = "0.9.0";
+    public const string Version = "0.9.1";
 
     /// <summary>The settings section that holds one on/off switch per kind of object.</summary>
     internal const string SettingsSection = "Harvest";
@@ -49,7 +49,11 @@ public sealed class Plugin : BaseUnityPlugin
         GameHook.Log = Logger;
         Settings = Config;
         TakeEverythingThatFits = Config.Bind("Behaviour", "TakeEverythingThatFits", false,
-            "Off (the default): each work order takes only its own item, all of it, and leaves the object's other items for their own work orders. Which item is collected first is then decided by the order of the work orders in the farm's panel. On: a villager collecting one item (fiber from a bush, say) also takes the object's other items (the wood) in the same visit, if they have room to carry them; what does not fit stays on the object.");
+            "Off (the default): each work order takes only its own item, all of it, and leaves the object's other items "
+            + "for their own work orders. Which item is collected first is then decided by the order of the work orders "
+            + "in the farm's panel. On: a villager collecting one item (fiber from a bush, say) also takes the object's "
+            + "other items (the wood) in the same visit, if they have room to carry them; what does not fit stays on "
+            + "the object.");
 
         GameAccess.Resolve();
         GameHook.CreateMod = () => new HarvestMod();

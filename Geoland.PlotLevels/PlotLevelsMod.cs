@@ -19,6 +19,8 @@
 // above the terrain belongs to the game's flat grid and its painter, and no upper level
 // is ever made there.
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using Dionic.ModAPI_1;
 using Geoland.Shared;
 using UnityEngine;
@@ -31,6 +33,7 @@ internal sealed class PlotLevelsMod : IMod
     // The game's internal names for the plot painter item and for the "use item" button.
     private const string PlotPainterItem = "plotPainter";
     private const string UseItemButton = "character/useItem";
+    private const string EraseButton = "misc/paintEraseMode";
 
     // The hint about picking a plot first is shown at most this often, in seconds. A
     // stroke calls for it on every frame the brush moves.
@@ -137,6 +140,24 @@ internal sealed class PlotLevelsMod : IMod
         return LevelMap.HeightOf(point) >= LowestUpperHeight(point.x, point.z);
     }
 
+    /// <summary>True while the painter's paint button or its erase button is held.</summary>
+    internal bool StrokeButtonHeld()
+    {
+        return input != null && (input.IsPressed(UseItemButton) || input.IsPressed(EraseButton));
+    }
+
+    /// <summary>True in the frame the paint button or the erase button goes down.</summary>
+    internal bool StrokeStartsThisFrame()
+    {
+        return input != null && (input.WasPressedThisFrame(UseItemButton) || input.WasPressedThisFrame(EraseButton));
+    }
+
+    /// <summary>The buttons were let go: the next stroke chooses its plot afresh.</summary>
+    internal void StrokeEnded()
+    {
+        strokePlot = 0;
+    }
+
     /// <summary>
     /// Paints or erases an upper level under the painter's brush. Called in place of the
     /// painter's own "apply the brush" step while it is aimed upstairs: on the click,
@@ -177,12 +198,22 @@ internal sealed class PlotLevelsMod : IMod
             return;
         }
 
-        int given = LevelMap.Paint(plots, brush.Cells(plots), brush.Height, strokePlot);
+        int given = LevelMap.Paint(plots, CellsWhereThisIsAnUpperFloor(brush), brush.Height, strokePlot);
         if (given > 0)
         {
             GameHook.Log.LogInfo($"Painter paint at {brush.Describe()}: height {brush.Height}, brush {brush.Size}, plot {strokePlot}, cells changed {given}");
             Notify(given + " cells, from height " + brush.Height + " up, now belong to " + Describe(strokePlot) + ".");
         }
+    }
+
+    // The brush's cells in which its height really is above the ground floor. On a slope
+    // the terrain under part of the brush can be higher than under the point aimed at;
+    // there the same height is the ground floor, and no level is made.
+    private List<Vector2Int> CellsWhereThisIsAnUpperFloor(PainterBrush brush)
+    {
+        return brush.Cells(plots)
+            .Where(cell => brush.Height >= LowestUpperHeight(cell.x + 0.5f, cell.y + 0.5f))
+            .ToList();
     }
 
     // The lowest height an upper level may start at above this spot.
@@ -262,8 +293,11 @@ internal sealed class PlotLevelsMod : IMod
     // typing in chat or another text field, and not while a menu is open.
     private bool PickKeyPressed()
     {
+        // "None" in the settings file switches the key off. The keyboard cannot be asked
+        // about that key: it throws.
+        Key key = Plugin.PickKey.Value;
         Keyboard keyboard = Keyboard.current;
-        if (keyboard == null || !keyboard[Plugin.PickKey.Value].wasPressedThisFrame) return false;
+        if (key == Key.None || keyboard == null || !keyboard[key].wasPressedThisFrame) return false;
         if (input != null && (input.IsTextFieldActive() || input.modalManager.IsGameModal())) return false;
         return true;
     }
