@@ -32,7 +32,7 @@ Each mod is a single file and works on its own. Install only the ones you want.
 6. Put the mods in, one of two ways:
    - **By hand:** copy the `Geoland.*.dll` files you want from the zip's `BepInEx\plugins` folder into the game's `BepInEx\plugins` folder. That is all an install is.
    - **With the installer, if you prefer (optional, Windows only):** double-click `install.cmd` in the unzipped folder. It finds the game through Steam, checks that the game is closed and that BepInEx is there, and copies the four mods into `BepInEx\plugins`. It changes nothing else. It is a plain PowerShell script, `install.ps1`, that you can read before running.
-7. Start the game. `BepInEx\LogOutput.log` in the game folder has a line for each mod that loaded, a line containing for example `Geoland.Planting 0.8.1 loaded, 4 patches applied, 0 failed`.
+7. Start the game. `BepInEx\LogOutput.log` in the game folder has a line for each mod that loaded, a line containing for example `Geoland.Planting 0.8.2 loaded, 4 patches applied, 0 failed`.
 
 You never need the installer; it only saves the copying. More about it, run from a command prompt in the unzipped folder.
 
@@ -75,9 +75,10 @@ Plant things yourself. The item selected in your hotbar decides what gets plante
 - Press **G** to switch planting mode on and off. The key is ignored while you are typing in a text field or have a menu open.
 - With the mode on and one of those items selected, a ghost of the plant shows the spot you are aiming at. Its outline shows whether the spot is good or refused.
 - Click to plant. One of the item is used up. With the mode off, or any other item selected, clicks do what they always do.
+- A new plant starts empty. It grows its first crop after the plant's normal refill time, like something you build.
 - Limits: within 12 cells of your character, not too close to water, and not on or beside the spot where another object stands (a large object is checked by its position, not its whole footprint).
 
-Settings, in `geoland.havencraft.planting.cfg`: `ToggleKey` (default `G`).
+Settings, in `geoland.havencraft.planting.cfg`: `ToggleKey` (default `G`). Set it to `None` to switch the key off.
 
 ### Geoland.Harvest
 
@@ -94,13 +95,14 @@ Villagers harvest. Paint a Farm plot over berry bushes, beehives, plain bushes o
 
 - Each order follows its own target and is judged by its own item alone. A full store of honey does not stop the wax being collected.
 - Each work order takes its own item, all of it (both fibers from a bush, say), and leaves the object's other items for their own work orders. The order of the work orders in the farm's panel decides which is collected first.
+- If the worker has no room for all of an item, it stays on the object for a later visit.
 - Optional, off by default: one visit takes everything that fits. With the setting on, a villager who collects an order's item from an object also takes the object's other items in the same visit, each only if all of it fits in their inventory: the wood along with the fiber from a bush, the wax along with the honey from a hive. What does not fit stays on the object for a later visit.
 - Items taken along in this way do not count against their own "keep" target, so a store can go over it.
 - Each item grows back on its own, after the object's normal refill time.
 - Picking by hand an object a villager has partly collected gives only what is left on it.
 - Which items have already been taken from an object is not saved. After loading, a full object offers all its items again.
 - Wild bee nests and the giant berry bush are left to the player. Villagers do not harvest them.
-- Taking everything in one visit and hand-picking giving only what is left are new in 0.9.0 and have not yet been seen working in the game.
+- Taking everything in one visit and hand-picking giving only what is left are new in 0.9.0. Both have been seen working in the game.
 
 Settings, in `geoland.havencraft.harvest.cfg`: in section `Behaviour`, `TakeEverythingThatFits` (default `false`: each order takes only its own item). Set it to `true` for the one-visit behaviour described above. In section `Harvest`, one on/off switch for each kind of harvestable object. All are on by default. The switches for the kinds of object are added to the file the first time a world is loaded. Its switches are named after the game's internal names for the kinds of object.
 
@@ -116,7 +118,7 @@ In the game, every floor of a building belongs to the plot painted on the ground
 | Click on an upstairs floor | Give that floor to the picked plot. Hold and drag to cover more. If the brush starts on a section already painted on that floor, the stroke extends that section instead |
 | The painter's erase button on an upstairs floor | Hand that floor back to the plot on the ground |
 
-Aimed at the ground floor or the terrain, the painter does exactly what it always did. While the painter is selected, every upstairs cell that has been given to a plot shows an outlined tile in that plot's colour, and a paler patch shows the brush.
+A stroke that begins on the ground floor or the terrain paints the ground as it always did. While the painter is selected, every upstairs cell that has been given to a plot shows an outlined tile in that plot's colour, and a paler patch shows the brush.
 
 Bedrooms above a shop, step by step:
 
@@ -127,13 +129,15 @@ Bedrooms above a shop, step by step:
 
 Good to know:
 
+- A stroke stays on the kind of floor it began on. A stroke begun upstairs does nothing while the brush is off the upstairs floors, on a wall or past the floor's edge. A stroke begun on the ground does nothing on an upstairs floor. To continue on the other kind of floor, release the button and press again.
+- If a plot is deleted, or erased on the ground down to nothing, its upper levels go with it. Beds and other objects upstairs then count for the plot that is there now.
 - A level runs from its floor upward until the next painted level above it. A third floor belongs to whatever the second floor was given, until you paint or erase the third floor itself.
 - Aim at bare floor. The height is taken from the surface under the crosshair, so aiming at a table top gives the table's height.
 - Known rough edge: the painter's own feedback text still describes the ground plot while you aim upstairs.
 - Not tested in multiplayer and not expected to work there: the levels are not sent to other players. If you try it anyway, do it on a copy of a world you do not mind losing.
 - Levels are stored inside the save file. If you remove the mod, the game ignores them. This comes from reading the game's code; it has not been tried. Two things follow. Without the mod, upstairs objects such as beds count for the plot on the ground again. And the first save made without the mod no longer contains the levels, so they are gone for good.
 
-Settings, in `geoland.havencraft.plotlevels.cfg`: `PickPlot` (the pick key, default `K`) and `MinHeightAboveGround` (default `2`): an upper level must start at least this many blocks above the terrain, and anything lower counts as the ground floor. Lowering or raising it only affects what can be painted from then on; levels already painted are kept.
+Settings, in `geoland.havencraft.plotlevels.cfg`: `PickPlot` (the pick key, default `K`; set it to `None` to switch the key off) and `MinHeightAboveGround` (default `2`): an upper level must start at least this many blocks above the terrain, and anything lower counts as the ground floor. Lowering or raising it only affects what can be painted from then on; levels already painted are kept.
 
 ### Geoland.RecruitWishes
 
@@ -147,15 +151,15 @@ Settings, in `geoland.havencraft.recruitwishes.cfg`: `Enabled` (default `true`) 
 
 ## What is tested and what is not
 
-Tested here means: seen working in the game by the author, on Alpha 6.0.5. The current versions were tidied up after much of that testing, without meaning to change what they do, so the list says which version each thing was seen with.
+Tested here means: seen working in the game by the author, on Alpha 6.0.5. The current versions were tidied up after much of that testing, without meaning to change what they do, so the list says which version each thing was seen with. Three of the mods then got fixes from a code review: Geoland.Planting 0.8.2, Geoland.Harvest 0.9.1 and Geoland.PlotLevels 0.5.2. Those three versions have not yet been run in the game. What was seen working was seen in the versions before them, and their fixes are in the "not yet seen" column.
 
-All four mods, current versions, load cleanly on Alpha 6.0.5.
+Geoland.RecruitWishes 0.2.1 loads cleanly on Alpha 6.0.5, and so did the versions before the fixes: Geoland.Planting 0.8.1, Geoland.Harvest 0.9.0 and Geoland.PlotLevels 0.5.1. The three new versions have not yet been loaded.
 
 | Mod | Seen working | Not yet seen |
 |---|---|---|
-| **Geoland.Planting** 0.8.1 | Planting wild cotton, and a wild cotton farm set up from it and worked by villagers (current version). The planting key ignored while a menu is open (current version). Planting berry bushes and fiber bushes (previous version; no change in behaviour intended since) | The planting key while typing in a text field |
-| **Geoland.Harvest** 0.9.0 | All six work orders, current version: berries, honey, wax, fiber, bush wood and wild cotton. Each order taking only its own item and all of it: wax taken and the honey left for the next visit; both fibers from a bush. Picking a half-collected object by hand giving only what is left. Wild cotton still being picked in winter. With the one-visit setting on, a worker clearing a whole bush in one visit | A worker who cannot unload moving on to another order |
-| **Geoland.PlotLevels** 0.5.1 | A home above a shop, and a home above a tavern, built from nothing: picking the plot, painting the upstairs floor, repainting and removing paint, villagers assigned to work downstairs and to live upstairs (current version). Tiles showing while the painter is out (current version). Painting on a third floor (previous version) | A third floor with the current version |
+| **Geoland.Planting** 0.8.2 | Planting wild cotton, and a wild cotton farm set up from it and worked by villagers (0.8.1). The planting key ignored while a menu is open (0.8.1). Planting berry bushes and fiber bushes (a version before 0.8.1) | Everything new in 0.8.2: a new plant starting empty and growing its first crop; the key switched off with `None`. The planting key while typing in a text field |
+| **Geoland.Harvest** 0.9.1 | All of this in 0.9.0. All six work orders: berries, honey, wax, fiber, bush wood and wild cotton. Each order taking only its own item and all of it: wax taken and the honey left for the next visit; both fibers from a bush. Picking a half-collected object by hand giving only what is left. Wild cotton still being picked in winter. With the one-visit setting on, a worker clearing a whole bush in one visit | Everything new in 0.9.1: an item staying on the object when the worker has no room for it. A worker who cannot unload moving on to another order |
+| **Geoland.PlotLevels** 0.5.2 | A home above a shop, and a home above a tavern, built from nothing: picking the plot, painting the upstairs floor, repainting and removing paint, villagers assigned to work downstairs and to live upstairs (0.5.1). Tiles showing while the painter is out (0.5.1). Painting on a third floor (a version before 0.5.1) | Everything new in 0.5.2: a stroke staying on the kind of floor it began on; a deleted plot's upper levels going with it, and the objects upstairs filed under the plot that is there now; no levels made on the ground floor of a slope; the tiles redrawn after an erase that changes no owner; the key switched off with `None`. A third floor with 0.5.1 or later |
 | **Geoland.RecruitWishes** 0.2.1 | Travelers recruited through varied wishes; wishes staying the same across saving and loading, as far as the author has tried (current version) | |
 
 Also not yet seen: the mods' names appearing in the game's error report.

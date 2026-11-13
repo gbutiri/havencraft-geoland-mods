@@ -2,6 +2,11 @@
 
 > **About this file:** what changed in each version of Geoland.Planting, newest first. Part of the Geoland library, unofficial mods for HavenCraft. Written with Claude, Anthropic's AI assistant, as the rest of the library was.
 
+## 0.8.2
+
+- A new plant starts empty and grows its first crop, like something you build. Before, it appeared full, so the item it cost came straight back with more. If a game update takes away what this relies on, the log says so and planting still works: the plants appear full again.
+- Setting `ToggleKey` to `None` in the settings file now switches the key off. Before, it caused an error every frame.
+
 ## 0.8.1
 
 - No change in what the plugin does for the player.

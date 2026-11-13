@@ -2,6 +2,15 @@
 
 > **About this file:** what changed in each version of Geoland.PlotLevels, newest first. Part of the Geoland library, unofficial mods for HavenCraft. Written with Claude, Anthropic's AI assistant, as the rest of the library was.
 
+## 0.5.2
+
+- A painter stroke stays on the kind of floor it began on. A stroke begun upstairs does nothing while the brush is off the upstairs floors, on a wall or past the floor's edge. A stroke begun on the ground does nothing on an upstairs floor. Before, a stroke begun upstairs and dragged onto a wall was handed back to the game's ground painter and could paint or erase ground plots. To continue on the other kind of floor, release the button and press again.
+- When a plot is deleted or erased down to nothing, its upper levels are removed first, so beds and other objects upstairs are filed under the plot that is there now. Before, they stayed listed under the deleted plot until the save was loaded again.
+- On a slope, a brush no longer makes levels in cells where its height is that cell's ground floor.
+- The plugin can no longer stop the game from saving if a game update changes what it reaches for.
+- Erasing a level that did not change who owns the floor now redraws the tiles.
+- Setting `PickPlot` to `None` in the settings file now switches the key off.
+
 ## 0.5.1
 
 - The keys J, L and H are gone. Levels are painted and erased with the plot painter's own click and erase button, which already did the same. K, to pick a plot, stays, and now only acts while the plot painter is selected.
