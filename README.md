@@ -149,14 +149,14 @@ Settings, in `geoland.havencraft.recruitwishes.cfg`: `Enabled` (default `true`) 
 
 Tested here means: seen working in the game by the author, on Alpha 6.0.5. The current versions were tidied up after much of that testing, without meaning to change what they do, so the list says which version each thing was seen with.
 
-All four mods load cleanly on Alpha 6.0.5. For Geoland.Harvest that was seen with 0.8.1; 0.9.0 has not yet been run in the game.
+All four mods, current versions, load cleanly on Alpha 6.0.5.
 
 | Mod | Seen working | Not yet seen |
 |---|---|---|
 | **Geoland.Planting** 0.8.1 | Planting berry bushes and fiber bushes (previous version; no change in behaviour intended since) | Planting wild cotton |
-| **Geoland.Harvest** 0.9.0 | A farm worker gathering berries up to the order's target, unloading and stopping (seen with 0.8.1). Honey and wax collected (seen with 0.8.0) | Anything with 0.9.0 itself. The fiber, bush wood and wild cotton orders. One visit taking everything that fits. Picking by hand giving only what is left |
-| **Geoland.PlotLevels** 0.5.1 | Beds above a shop counting for the home; painting on the second and third floors (previous version). Tiles showing while the painter is out (current version) | A villager sleeping in an upstairs bed |
-| **Geoland.RecruitWishes** 0.2.1 | Three travelers recruited through varied wishes (previous version) | A wish staying the same after saving and loading |
+| **Geoland.Harvest** 0.9.0 | The fiber and bush wood orders: a worker taking both fibers from each bush, and the bushes emptying once the wood is taken too (current version). With the one-visit setting on, a worker clearing a whole bush in one visit (current version). A farm worker gathering berries up to the order's target, unloading and stopping (seen with 0.8.1). Honey and wax collected (seen with 0.8.0) | The wild cotton order. Honey and wax with 0.9.0. Picking by hand giving only what is left. A worker who cannot unload moving on to another order |
+| **Geoland.PlotLevels** 0.5.1 | A shop on the ground floor with a home above it, built from nothing: picking the plot, painting the upstairs floor, repainting and removing paint, villagers assigned to work downstairs and to live upstairs (current version). Tiles showing while the painter is out (current version). Painting on a third floor (previous version) | A villager seen asleep in an upstairs bed. A third floor with the current version |
+| **Geoland.RecruitWishes** 0.2.1 | Travelers recruited through varied wishes (current version) | A wish staying the same after saving and loading |
 
 Also not yet seen: the mods' names appearing in the game's error report.
 
