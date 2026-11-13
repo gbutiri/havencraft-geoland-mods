@@ -1,6 +1,6 @@
 # The Geoland library: fan-made mods for HavenCraft
 
-Four small mods for HavenCraft, the village-building game by Dionic Software. They are unofficial and made by a fan. HavenCraft is the work of Dionic Software, and this project is not affiliated with them. Published with the developer's permission. Not made, endorsed or supported by Dionic Software.
+Five small mods for HavenCraft, the village-building game by Dionic Software. They are unofficial and made by a fan. HavenCraft is the work of Dionic Software, and this project is not affiliated with them. Published with the developer's permission. Not made, endorsed or supported by Dionic Software.
 
 Written for HavenCraft **Alpha 6.0.5**, on Windows. The library as a whole has a version of its own (see `VERSION` and the Releases page); each mod inside also keeps its own.
 
@@ -10,6 +10,7 @@ Written for HavenCraft **Alpha 6.0.5**, on Windows. The library as a whole has a
 | **Geoland.Harvest** | Villagers harvest. Farm plots get work orders for berries, honey, wax, fiber, bush wood and wild cotton. |
 | **Geoland.PlotLevels** | An upstairs floor can belong to a different plot than the ground below it, so bedrooms can sit above a shop. |
 | **Geoland.RecruitWishes** | Once the game's fixed list of joining prices is used up, each traveler asks for something of their own instead of the same thing every time. |
+| **Geoland.Mines** | A Tree Stake placed on a Miner Zone becomes a mine. A rock appears in it for your miners, and a new one some time after it is mined out. |
 
 Each mod is a single file and works on its own. Install only the ones you want.
 
@@ -31,7 +32,7 @@ Each mod is a single file and works on its own. Install only the ones you want.
 5. Download the Geoland library zip from the [Releases page](https://github.com/gbutiri/havencraft-geoland-mods/releases) and unzip it anywhere.
 6. Put the mods in, one of two ways:
    - **By hand:** copy the `Geoland.*.dll` files you want from the zip's `BepInEx\plugins` folder into the game's `BepInEx\plugins` folder. That is all an install is.
-   - **With the installer, if you prefer (optional, Windows only):** double-click `install.cmd` in the unzipped folder. It finds the game through Steam, checks that the game is closed and that BepInEx is there, and copies the four mods into `BepInEx\plugins`. It changes nothing else. It is a plain PowerShell script, `install.ps1`, that you can read before running.
+   - **With the installer, if you prefer (optional, Windows only):** double-click `install.cmd` in the unzipped folder. It finds the game through Steam, checks that the game is closed and that BepInEx is there, and copies the five mods into `BepInEx\plugins`. It changes nothing else. It is a plain PowerShell script, `install.ps1`, that you can read before running.
 7. Start the game. `BepInEx\LogOutput.log` in the game folder has a line for each mod that loaded, a line containing for example `Geoland.Planting 0.8.2 loaded, 4 patches applied, 0 failed`.
 
 You never need the installer; it only saves the copying. More about it, run from a command prompt in the unzipped folder.
@@ -48,13 +49,13 @@ To show what would be copied, and copy nothing:
 install.cmd -DryRun
 ```
 
-To remove the four Geoland mods again:
+To remove the five Geoland mods again:
 
 ```
 install.cmd -Uninstall
 ```
 
-The installer does not install BepInEx, and it never deletes or overwrites anything except the four Geoland DLLs.
+The installer does not install BepInEx, and it never deletes or overwrites anything except the five Geoland DLLs.
 
 To update, install the new version the same way. The old files are replaced.
 
@@ -182,11 +183,55 @@ A traveler joins the village when you bring what they ask for. The game has a fi
 
 Settings, in `geoland.havencraft.recruitwishes.cfg`: `Enabled` (default `true`) and `Pool`, the list of goods and amounts, written as `item:min-max` separated by commas. Item names are the game's internal names. Names the game does not know are skipped and listed in the log.
 
+### Geoland.Mines
+
+In the game, a rock that has been mined out is gone for good, so a village's stone runs out near home. This mod makes a mine out of two things the game already has: the Tree Stake, the craftable stake that woodcutters sow trees in, and the Miner Zone. A Tree Stake placed on a Miner Zone is a mine. One of the game's own rocks appears in the middle of it, your miners mine it, and some time after it is mined out the next one appears.
+
+**This makes stone unlimited, which changes the game's balance.** How long a mine waits and which rock it gets are both settings, see below.
+
+**A mine, step by step**
+
+You need what the game itself asks for: the techs that unlock the Tree Stake and the Miner Zone's "Mine Rocks" order.
+
+1. Paint a Miner Zone, or use one you have.
+2. Craft a Tree Stake and place it on the Miner Zone.
+3. Wait. With the default settings the first rock appears after three and a half minutes of play.
+4. Assign a worker to the Miner Zone and switch its "Mine Rocks" order on, as you would for any rocks on the plot.
+5. When the rock is mined out, the stake is empty again and the wait starts again. Then the next rock appears.
+
+When you load a world that has a Miner Zone, a notice says that the mod is active.
+
+**Rules worth knowing**
+
+- **Only Tree Stakes on a Miner Zone are mines.** A Tree Stake on any other kind of plot is never touched, so woodcutters' stakes work as they always did.
+- **One rock per stake.** A mine that holds a rock gets no second one.
+- **The wait starts when the mine is empty.** That is when the mod first sees an empty stake, and again each time a rock is gone. It makes no difference who broke the rock, a villager or you.
+- **The wait only runs while the game runs.** It is counted in the game's own ticks, which stop while the game is paused.
+- **The wait is not kept in the save.** After loading, an empty mine waits the whole time again. A mine that held a rock when you saved is expected to hold it still, because the game itself saves which stake holds what. This comes from reading the game's code; it has not been seen.
+- **You can still sow a sapling by hand in an empty mine.** The mine then waits until the sapling or the tree is gone, and after that for the usual time. No villager sows a mine.
+- **The rocks are ordinary rocks.** The mod brings none of its own. It asks the game to place one of the rocks the game already has.
+- If you repaint the plot as something else, or take the stake away from the Miner Zone, it is no longer a mine. The mod does not remove a rock that is already there.
+- Nothing of the mod's is stored in the save, so the mod can be removed at any time.
+- The game may get mines of its own one day. This mod can simply be removed then.
+
+**Limits**
+
+- Villagers mining the rock in a stake has not yet been seen. See "What is tested and what is not".
+- The larger rocks, `rockA` and `rockB`, are two cells wide and may not fit inside the stake. They have not been tried.
+- Not tested in multiplayer. The mod is written to act only for the host of a game.
+- The BepInEx log has a line for each rock placed and for each rock found gone, with the stake's position and the plot's number.
+
+Settings, in `geoland.havencraft.mines.cfg`, section `Mines`:
+
+- `Enabled` (default `true`). Set it to `false` and no rocks are placed.
+- `Rock` (default `rockC`): which of the game's rocks appears, by the game's internal name, or `random`. `rockC` is the medium rock and gives 45 stone. `rockD` and `rockE` are small and give 21 each. `random` picks afresh each time, a medium or a small rock with an even chance. `rockA` and `rockB` are two cells wide and give 65; they may not fit inside the stake and are never picked by `random`. Anything else is treated as `rockC`, with a line in the log.
+- `WaitTicks` (default `21000`): how long an empty mine waits for its next rock, in game ticks. The game counts 100 ticks a second while it is not paused. The default is three and a half minutes of play, a little under three and a half hours on the game's clock at its usual day length. Values below 100 are treated as 100.
+
 ## What is tested and what is not
 
 Tested here means: seen working in the game by the author, on Alpha 6.0.5. The current versions were tidied up after much of that testing, without meaning to change what they do, so the list says which version each thing was seen with. Three of the mods then got fixes from a code review: Geoland.Planting 0.8.2, Geoland.Harvest 0.9.1 and Geoland.PlotLevels 0.5.2. The author has played those three versions briefly. The list says what was seen in them; the rest was seen in the versions before, and the fixes not yet seen are in the last column.
 
-All four mods, current versions, load cleanly on Alpha 6.0.5.
+The first four mods, current versions, load cleanly on Alpha 6.0.5. Geoland.Mines 0.1.0 loaded cleanly beside them. Geoland.Mines 0.1.2 has not yet been loaded in the game.
 
 | Mod | Seen working | Not yet seen |
 |---|---|---|
@@ -194,6 +239,7 @@ All four mods, current versions, load cleanly on Alpha 6.0.5.
 | **Geoland.Harvest** 0.9.1 | Villagers harvesting through a day of play (0.9.1). All of this in 0.9.0. All six work orders: berries, honey, wax, fiber, bush wood and wild cotton. Each order taking only its own item and all of it: wax taken and the honey left for the next visit; both fibers from a bush. Picking a half-collected object by hand giving only what is left. Wild cotton still being picked in winter. With the one-visit setting on, a worker clearing a whole bush in one visit | Everything new in 0.9.1: an item staying on the object when the worker has no room for it. A worker who cannot unload moving on to another order |
 | **Geoland.PlotLevels** 0.5.2 | A home above a shop, and a home above a tavern, built from nothing: picking the plot, painting the upstairs floor, repainting and removing paint, villagers assigned to work downstairs and to live upstairs (0.5.1). Tiles showing while the painter is out (0.5.1). Painting and erasing upstairs, and a stroke staying on the kind of floor it began on (0.5.2). A plot erased down to nothing on the ground losing its upstairs floor with it, and a bed on that floor counting for the home again as soon as the floor was repainted (0.5.2). Levels loaded from a save (0.5.2). A building with a different plot on each of three floors, painted from nothing (0.5.2) | No levels made on the ground floor of a slope; the tiles redrawn after an erase that changes no owner; the key switched off with `None`. Erasing on a third floor |
 | **Geoland.RecruitWishes** 0.2.1 | Travelers recruited through varied wishes; wishes staying the same across saving and loading, as far as the author has tried (current version) | |
+| **Geoland.Mines** 0.1.2 | All of this in 0.1.0, with the rocks broken by the player by hand: the mod loading cleanly beside the other four. A Tree Stake placed on a Miner Zone. The rock appearing after the wait. A new rock appearing after the last was broken, six times in a row at one stake | A villager mining a rock in a stake. This is what the mod is for; from the game's code it should work. The medium rock and the `random` setting (new in 0.1.1 and 0.1.2, not yet run). The rock still in its stake after saving and loading. A larger rock inside a stake |
 
 Also not yet seen: the mods' names appearing in the game's error report.
 
@@ -207,11 +253,12 @@ Nothing here has been tested in multiplayer. Geoland.PlotLevels is not tested in
 - **Geoland.PlotLevels:** the game ignores the levels. This too comes from reading the game's code and has not been tried. Upstairs objects such as beds count for the plot on the ground again. The first save made without the mod no longer contains the levels, so they are gone for good.
 - **Geoland.Planting:** plants you planted are ordinary objects of the game and are expected to stay. This has not been tried.
 - **Geoland.RecruitWishes:** travelers go back to asking for the game's last joining price, including any traveler who was waiting with a wish. This is expected from how the mod works; it has not been tried.
+- **Geoland.Mines:** nothing of the mod's is in the save. A rock already standing in a stake is an ordinary rock and is expected to stay; no new ones appear. The Tree Stakes stay where they are. This comes from reading the game's code; it has not been tried.
 
 To remove the mods:
 
 1. Close the game.
-2. Delete the four `Geoland.*.dll` files from the game's `BepInEx\plugins` folder, or run `install.cmd -Uninstall`.
+2. Delete the five `Geoland.*.dll` files from the game's `BepInEx\plugins` folder, or run `install.cmd -Uninstall`.
 
 That removes the mods. It does not stop the game marking saves: the mod loader causes the mark, and it is still installed.
 

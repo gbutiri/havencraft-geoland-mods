@@ -1,6 +1,6 @@
 # How it works: HavenCraft from a modder's side, and how the Geoland mods hook in
 
-> **About this document:** unofficial notes on how HavenCraft is put together as far as a modder needs to know, and on how the four Geoland mods hook into it. HavenCraft is the work of Dionic Software; nothing of the game (no code, no data, no assets) is included here, only descriptions in our own words and the names of things. It describes HavenCraft Alpha 6.0.5 and may be out of date after any game update. Published with the developer's permission. Not made, endorsed or supported by Dionic Software. It was written with Claude, Anthropic's AI assistant.
+> **About this document:** unofficial notes on how HavenCraft is put together as far as a modder needs to know, and on how the five Geoland mods hook into it. HavenCraft is the work of Dionic Software; nothing of the game (no code, no data, no assets) is included here, only descriptions in our own words and the names of things. It describes HavenCraft Alpha 6.0.5 and may be out of date after any game update. Published with the developer's permission. Not made, endorsed or supported by Dionic Software. It was written with Claude, Anthropic's AI assistant.
 
 **How to read the certainty marks.** "Seen working" means the author saw it behave that way in the running game. "From the code" means it was only read in the game's code or data and has not been tested. Anything without a mark is from the code.
 
@@ -83,6 +83,8 @@
 - **Heights.** Terrain is regenerated from the world's seed, not stored. The game does not snap objects to the ground on load; the stored height is used as it is (seen in the game). To place something on the ground, ask the game: `HeightAndBiomeModule.SampleHeight` gives the terrain height, and `WorldObjectUtil` has a function that turns a world position into the right `GridTransform` for a given object. This is what the game's own wild-plant spawner does. Seen working.
 - **Ghosts.** A ghost from `SpawnWorldObjectGhost` can be moved, shown, hidden and given the game's building or demolishing outline. The game puts ghosts on their own Unity layer. Seen working.
 - Spawned natural objects start full and get their components (harvest, resource node) automatically. From the code: an object the player builds starts empty instead, with its refill timer running. Geoland.Planting empties what it plants in the same way (section 16).
+- **Fields.** From the code: a Tree Stake is a field (`FieldWOComponent`). A field remembers the one object that grows in it, and answers with nothing once that object no longer exists. The game uses this for a sapling and then for the tree it becomes. Asking a field what it holds and handing it an object are both public calls. The game writes that link to the save itself. The game places what grows in a field at the field's own position moved by an offset from the field's definition, which for the Tree Stake is its middle cell; the definition is held privately.
+- From the code: a rock that has been mined out is gone for good. The game's data defines five rocks that the "Mine Rocks" order works on, `rockA` to `rockE`. The first two cover two by two cells, the others one.
 
 ## 7. Player: inventory, keys, clicks, notifications
 
@@ -108,6 +110,7 @@
   - A worker holding a **full stack of any output item** goes to clear inventory first; with no chest space she waits and retries.
   - So: one recipe per item.
 - A work order has a mode, such as keep an amount in storage.
+- From the code: a rock spawned on a Miner Zone is filed under that plot and offered to its "Mine Rocks" order without being asked. A Miner Zone has no "Plant Trees at Stakes" order.
 
 ## 9. Harvestable objects
 
@@ -122,6 +125,7 @@
 - **Storage:** `PlotModule` keeps one flat grid with a plot number for every ground cell. Zero means wilderness. There is no height: a plot covers its cells from the ground through every floor above.
 - **Lookup:** every question in play of the kind "which plot is this in?" ends in `PlotModule.GetPlot`, which takes a full world position, drops the height and reads the grid. "Which plot is this object in?" passes the object's centre. Only the plot module's own internals (saving, the overlay, borders, multiplayer chunks) and the painter read the grid directly. One patch that runs after `GetPlot` therefore changes the answer everywhere. Seen working.
 - **Object tracking:** the plot module's tracker files objects that have tracking keys under their plot, on creation and at load. It re-files them when the module raises its "plot shapes changed" event. If you change which plot a place belongs to, raise that event for both the plot that lost space and the one that gained it. Plot signs, chests and the work planner listen to it too. From the code: a plot that loses its last ground cell is announced through this event first and destroyed only afterwards.
+- The tracker hands out its lists per plot and per tracking key, so the objects of one kind on one plot can be found without searching the world. Seen working for Tree Stakes on a Miner Zone. From the code: in a multiplayer game the tracker gives a guest no lists.
 - A plot has an ID, a name, bounds and a configuration that says what kind it is (a home, a farm, a workshop and so on). The game derives a default colour from the plot's ID.
 - **Homes:** a bed counts for a home when it is indoors and filed under a Home plot. Assigning a villager through the home's panel gives the first free bed on the plot, on any floor. Seen working with plot levels: beds on an upstairs floor given to a Home plot, above a shop, count for that home.
 - Villagers' pathfinding does not look at plots (from the code).
@@ -170,7 +174,7 @@ All from the code:
 
 ## 16. How each mod hooks in
 
-All four start the same way. BepInEx creates the plugin's `Plugin` class, which reads the settings, checks through `GameAccess` that the parts of the game it relies on are still there, and applies its patches. `RegisterModPatch` then puts the plugin's mod in the game's own list for every world.
+All five start the same way. BepInEx creates the plugin's `Plugin` class, which reads the settings, checks through `GameAccess` that the parts of the game it relies on are still there, and applies its patches. `RegisterModPatch` then puts the plugin's mod in the game's own list for every world.
 
 ### Geoland.Planting
 
@@ -214,6 +218,20 @@ All four start the same way. BepInEx creates the plugin's `Plugin` class, which 
 - **Why there:** those two functions are the only way in and out of the join panel.
 - A wish is worked out from the traveler's ID number and nothing else, so it should stay the same across saving and loading. Seen staying the same as far as the author has tried. Nothing is written to the save. Each traveler's wish is made once and the same list object handed out every time, because the game compares prices by reference.
 - The pool of wishes is read from the settings when a world has loaded, since item names can only be checked against a loaded world.
+
+### Geoland.Mines
+
+- **What it does:** a Tree Stake that stands on a Miner Zone is a mine. The plugin keeps one of the game's own rocks standing in it, and places a new one some time after the last was mined out. The Miner Zone's villagers are meant to mine it with the game's own "Mine Rocks" order. A Tree Stake on any other plot is left alone.
+- **No patch of its own.** The plugin applies only the shared patches every Geoland plugin has. Everything it does runs from the game's "world loaded" and "every frame" calls (`MinesMod`). The frame call only compares the clock; about once a second it lets `MineKeeper` look at the mines.
+- **How a mine is recognised** (`MineKeeper`): the plot module's tracker files every Tree Stake under the plot it stands on. The plugin asks the tracker for each Miner Zone's list of stakes. The world's objects are never searched. The plugin acts only for the host of a multiplayer game, because the tracker gives a guest no lists.
+- **How "empty" is decided:** by the stake's own answer to "what grows in you". If the stake holds anything, a rock, a sapling or a tree, it is left alone. If it holds nothing, the wait starts. The plugin keeps no list of rocks.
+- **Placing** (`MineKeeper`, `GameAccess`): when the wait is over, the rock is spawned with the world object module's own spawn call, at the place where the game would put the stake's sapling. The plugin then hands the rock to the stake with the same public call the game uses for a sapling. When the rock is mined out the stake answers with nothing again. The offset to the sapling's place is the plugin's one reach into a private part of the game.
+- **Saving:** the plugin writes nothing to the save. The game saves the link between a stake and what it holds itself, so after loading a stake with a rock should still answer with its rock. Only the wait is not saved: a stake found empty after loading waits the whole time again.
+- **Which rock** (`RockChoice`): a setting names one of the game's five rocks, or `random`, which draws a one-cell rock afresh each time. Every name is checked against the running game's list of objects when a world has loaded, and against the tracking key the "Mine Rocks" order looks for.
+- **The wait** is counted in the simulation's ticks, so it stops while the game is paused.
+- **Errors:** one mine that cannot be kept is left alone for the rest of that world's session and the others go on. If the whole look fails, the plugin stops for that world.
+- **Seen working** (in 0.1.0, with the rocks broken by the player by hand): stakes on a Miner Zone found through the tracker, the rock placed after the wait, the stake answering "empty" once its rock was broken, and the next rock placed, six times in a row at one stake.
+- **From the code, not yet seen in play:** a villager mining a rock that stands in a stake. The rock still linked to its stake after saving and loading. The medium rock and the `random` choice (0.1.1 and 0.1.2). A sapling sown by hand in a mine. A two-cell rock inside a stake: the stake's definition blocks only its middle cell for walking, and nothing was checked beyond that cell. A guest in a multiplayer game.
 
 ## 17. Pitfalls
 

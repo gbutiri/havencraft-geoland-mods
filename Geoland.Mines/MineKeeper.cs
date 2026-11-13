@@ -10,8 +10,9 @@
 // placed in the stake and handed to it. When that rock has been mined out the stake
 // holds nothing again, and the wait starts again.
 //
-// How it relates to the game (all of it read in the game's code and data, not yet seen
-// in play):
+// How it relates to the game (read in the game's code and data; of it, a stake on a Miner
+// Zone getting its rock after the wait, and the next rock after that one was broken,
+// have been seen in play; villagers mining the rock has not):
 //  - The plot module's tracker files every Tree Stake under the plot it stands on, and
 //    hands out that list per plot. So the stakes are found by asking for each Miner
 //    Zone's list; the world's objects are never searched. In a multiplayer game the
