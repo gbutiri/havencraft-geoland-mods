@@ -39,7 +39,8 @@ public sealed class Plugin : BaseUnityPlugin
 
     /// <summary>
     /// When on, a villager who has collected a work order's item also takes whatever else
-    /// the object holds, as far as it fits in their inventory (see HarvestWork).
+    /// the object holds, as far as it fits in their inventory (see HarvestWork). Off by
+    /// default: each work order then takes only its own item.
     /// </summary>
     internal static ConfigEntry<bool> TakeEverythingThatFits { get; private set; }
 
@@ -47,8 +48,8 @@ public sealed class Plugin : BaseUnityPlugin
     {
         GameHook.Log = Logger;
         Settings = Config;
-        TakeEverythingThatFits = Config.Bind("Behaviour", "TakeEverythingThatFits", true,
-            "A villager collecting one item from an object (fiber from a bush, say) also takes the object's other items (the wood) in the same visit, if they have room to carry them. What does not fit stays on the object. Turn off to have each work order take only its own item.");
+        TakeEverythingThatFits = Config.Bind("Behaviour", "TakeEverythingThatFits", false,
+            "Off (the default): each work order takes only its own item, all of it, and leaves the object's other items for their own work orders. Which item is collected first is then decided by the order of the work orders in the farm's panel. On: a villager collecting one item (fiber from a bush, say) also takes the object's other items (the wood) in the same visit, if they have room to carry them; what does not fit stays on the object.");
 
         GameAccess.Resolve();
         GameHook.CreateMod = () => new HarvestMod();

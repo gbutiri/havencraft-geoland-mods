@@ -4,7 +4,7 @@
 
 ## 0.9.0
 
-- **One visit takes everything that fits.** A villager who collects a work order's item from an object now also takes the object's other items in the same visit, if they have room to carry them: fiber and the wood from a bush, honey and the wax from a hive. What does not fit stays on the object for a later visit. Each work order is still judged by its own item, so a full store of one item does not stop the other being collected. The extra items do not count toward any target while they are being carried in this way, so a store can go over its "keep" amount. Setting: `TakeEverythingThatFits` (on by default).
+- **Optional: one visit takes everything that fits.** Off by default, because it lets one work order bring in another order's item past that item's target; with it off, each order takes only its own item, as before, and the order of the work orders in the farm's panel decides which is collected first. With the setting on, a villager who collects a work order's item from an object also takes the object's other items in the same visit, if they have room to carry them: fiber and the wood from a bush, honey and the wax from a hive. What does not fit stays on the object for a later visit. Each work order is still judged by its own item, so a full store of one item does not stop the other being collected. The extra items do not count toward any target while they are being carried in this way, so a store can go over its "keep" amount. Setting: `TakeEverythingThatFits`.
 - **Picking by hand gives only what is left.** If a villager has already taken the fiber from a bush, harvesting it yourself gives the wood and not the fiber again. Before, a half-collected object gave everything a second time.
 
 ## 0.8.1

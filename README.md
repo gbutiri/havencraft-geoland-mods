@@ -93,7 +93,8 @@ Villagers harvest. Paint a Farm plot over berry bushes, beehives, plain bushes o
 | Gather Wild Cotton | wild cotton plants |
 
 - Each order follows its own target and is judged by its own item alone. A full store of honey does not stop the wax being collected.
-- One visit takes everything that fits. A villager who collects an order's item from an object also takes the object's other items in the same visit, each only if all of it fits in their inventory: the wood along with the fiber from a bush, the wax along with the honey from a hive. What does not fit stays on the object for a later visit.
+- Each work order takes its own item, all of it (both fibers from a bush, say), and leaves the object's other items for their own work orders. The order of the work orders in the farm's panel decides which is collected first.
+- Optional, off by default: one visit takes everything that fits. With the setting on, a villager who collects an order's item from an object also takes the object's other items in the same visit, each only if all of it fits in their inventory: the wood along with the fiber from a bush, the wax along with the honey from a hive. What does not fit stays on the object for a later visit.
 - Items taken along in this way do not count against their own "keep" target, so a store can go over it.
 - Each item grows back on its own, after the object's normal refill time.
 - Picking by hand an object a villager has partly collected gives only what is left on it.
@@ -101,7 +102,7 @@ Villagers harvest. Paint a Farm plot over berry bushes, beehives, plain bushes o
 - Wild bee nests and the giant berry bush are left to the player. Villagers do not harvest them.
 - Taking everything in one visit and hand-picking giving only what is left are new in 0.9.0 and have not yet been seen working in the game.
 
-Settings, in `geoland.havencraft.harvest.cfg`: in section `Behaviour`, `TakeEverythingThatFits` (default `true`). Set it to `false` and each order takes only its own item, leaving the rest on the object. In section `Harvest`, one on/off switch for each kind of harvestable object. All are on by default. The switches for the kinds of object are added to the file the first time a world is loaded. Its switches are named after the game's internal names for the kinds of object.
+Settings, in `geoland.havencraft.harvest.cfg`: in section `Behaviour`, `TakeEverythingThatFits` (default `false`: each order takes only its own item). Set it to `true` for the one-visit behaviour described above. In section `Harvest`, one on/off switch for each kind of harvestable object. All are on by default. The switches for the kinds of object are added to the file the first time a world is loaded. Its switches are named after the game's internal names for the kinds of object.
 
 If you remove the mod: a world saved with these work orders still loads, but that farm's work orders are reset to the game's defaults. This comes from reading how the game loads saves; it has not been tried.
 
